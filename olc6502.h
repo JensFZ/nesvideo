@@ -22,6 +22,14 @@ public:
 		N = (1<<7), // Negative
 	};
 
+	//register:
+	uint8_t a = 0x00;		//Accumulator
+	uint8_t x = 0x00;		// X Register
+	uint8_t y = 0x00;		// y Register
+	uint8_t stkp = 0x00;	// Stack Pointer
+	uint16_t pc = 0x0000;	// Program Counter
+	uint8_t status = 0x00;	// Status
+
 	void ConnectBus(Bus* n) {
 		bus = n;
 	}
