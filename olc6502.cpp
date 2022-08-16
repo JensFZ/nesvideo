@@ -3,7 +3,7 @@
 
 olc6502::olc6502() 
 {
-	using a = olc6502;
+	using a = olc6502; // nur da um die nachfolgende Tabelle etwas kürzer zu gestallten, ansonsten müsste anstelle von &a:: &olc6502:: jedesmal stehen
 
 	// Abbildung der Grafik auf Seite 22 der Dokumentation des 6502 CPUs (zu finden im Ordner Docs\CPU)
 	lookup = { // {name, opcode, Adressingmode, Taktzyclen}
