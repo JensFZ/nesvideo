@@ -61,6 +61,10 @@ public:
 	uint8_t TSX(); uint8_t TXA(); uint8_t TXS(); uint8_t TYA();
 	uint8_t XXX(); //Illegaler Opcode aufgerufen
 
+	void clock();
+	void reset();
+	void irq();
+	void nmi();
 private:
 	Bus* bus = nullptr;
 	uint8_t read(uint16_t a); // Adresse lesen
