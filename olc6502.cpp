@@ -222,3 +222,15 @@ uint8_t olc6502::IZY() { // Indirect Y mode (dieser modus funktioniert anders al
 }
 #pragma endregion
 
+#pragma region Instructions
+uint8_t olc6502::fetch()
+{
+	if (!(lookup[opcode].addrmode == &olc6502::IMP)) { // alle auﬂer IMP Mode 
+		fetched = read(addr_abs);
+	}
+
+	return fetched;
+}
+#pragma endregion
+
+
