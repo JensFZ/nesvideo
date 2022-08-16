@@ -1,6 +1,7 @@
 #pragma once
 //#include "Bus.h"
 #include <cstdint>
+#include <string>
 
 class Bus;
 
@@ -81,5 +82,12 @@ private:
 
 	uint8_t getFlag(FLAGS6502 f);			// Flag lesen
 	void	setFlag(FLAGS6502 f, bool v);	// Flag setzen
+
+	struct INSTRUCTION {
+		std::string name;
+		uint8_t(olc6502::* operate)(void) = nullptr;
+		uint8_t(olc6502::* addrmode)(void) = nullptr;
+		uint8_t cycles = 0;
+	};
 };
 
