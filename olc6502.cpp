@@ -1,4 +1,4 @@
-#7include "olc6502.h"
+#include "olc6502.h"
 #include "Bus.h"
 
 olc6502::olc6502() 
@@ -79,4 +79,145 @@ void olc6502::clock()
 	cycles--;
 }
 
+
+// Addressing Modes
+
+uint8_t olc6502::IMP() // Implied -> keine Daten angegeben aber A register könnte benötigt werden
+{
+	fetched = a;
+	return 0;
+}
+
+uint8_t olc6502::IMM() // Immediate mode -> Daten sind teil der instruction (1 Byte) -> aus dem BUS lesen
+{
+	addr_abs = pc++;
+	return 0;
+}
+
+uint8_t olc6502::ZP0() // Zero Page Adressing
+{
+	// Zeropage = 0x0000 - 0x00FF -> das Byte gibt den Adressraum in Page 0x00 an.
+	addr_abs = read(pc);
+	pc++;
+	addr_abs &= 0x00FF;
+	return 0;
+}
+
+uint8_t olc6502::ZPX() // X Register Zero Page Adressing
+{
+	addr_abs = (read(pc) + x); // Adresse aus Bus + X Positionen aus dem X Register
+	pc++;
+	addr_abs &= 0x00FF;
+	return 0;
+}
+
+uint8_t olc6502::ZPY() // Y Register Zero Page Adressing
+{
+	addr_abs = (read(pc) + y); // Adresse aus Bus + X Positionen aus dem Y Register
+	pc++;
+	addr_abs &= 0x00FF;
+	return 0;
+}
+
+uint8_t olc6502::REL() // Relative Mode. Wird für Sprünge verwendet. das ziel kann nur -128 und +127 positionen von der Adresse entfernt sein. 
+{
+	addr_rel = read(pc);
+	pc++;
+	if (addr_rel & 0x80)
+	{
+		addr_rel |= 0xFF00;
+	}
+	return 0;
+}
+
+uint8_t olc6502::ABS() { // Absolute Adresse angegeben
+	uint16_t lo = read(pc); // Lower bit adress lesen, z.B. 0x02
+	pc++;
+	uint16_t hi = read(pc); //Higher bit adress lesen z.B. 0xA2
+	pc++;
+
+	addr_abs = (hi << 8) | lo; // Higher und Lower adress zusammensetzeb zu z.B. 0xA202
+
+	return 0;
+}
+
+uint8_t olc6502::ABX() { // Absolute Adresse angegeben + X Register
+	uint16_t lo = read(pc); // Lower bit adress lesen, z.B. 0x02
+	pc++;
+	uint16_t hi = read(pc); //Higher bit adress lesen z.B. 0xA2
+	pc++;
+
+	addr_abs = (hi << 8) | lo; // Higher und Lower adress zusammensetzeb zu z.B. 0xA202
+	addr_abs += x; // X Register Schritte weiter gehen
+
+	// Taktzyklen ggf. erweitern
+	if((addr_abs & 0xFF00) != (hi << 8)) { // Wenn die Adresse größer als eine angegebene Page ist -> +1 Takt
+		return 1;
+	}
+	return 0;
+}
+
+uint8_t olc6502::ABY() { // Absolute Adresse angegeben + X Register
+	uint16_t lo = read(pc); // Lower bit adress lesen, z.B. 0x02
+	pc++;
+	uint16_t hi = read(pc); //Higher bit adress lesen z.B. 0xA2
+	pc++;
+
+	addr_abs = (hi << 8) | lo; // Higher und Lower adress zusammensetzeb zu z.B. 0xA202
+	addr_abs += y; // Y Register Schritte weiter gehen
+
+	// Taktzyklen ggf. erweitern
+	if ((addr_abs & 0xFF00) != (hi << 8)) { // Wenn die Adresse größer als eine angegebene Page ist -> +1 Takt
+		return 1;
+	}
+	return 0;
+}
+
+uint8_t olc6502::IND() //Indirekte Adressierung
+{
+	uint16_t ptr_lo = read(pc); // Pointer low Adress lesen
+	pc++;
+	uint16_t ptr_hi = read(pc); // Pointer high adress lesen
+	pc++;
+
+	uint16_t ptr = (ptr_hi << 8) | ptr_lo; // Pointer zusammensetzen
+
+	// Da die 6502 Hardware einen Bug hat, wenn der low pointer auf 0x00FF zeigt, muss dieses verhalten hier nachgebaut werden
+
+	if(ptr_lo == 0x00FF) 
+	{
+		addr_abs = (read(ptr & 0xFF00) << 8) | read(ptr + 0);
+	} else { // So soll es sein ;)
+		addr_abs = (read(ptr + 1) << 8) | read(ptr + 0); // Adresswerte aus dem Bus lesen an position des Pointers
+	}
+	return 0;
+}
+
+uint8_t olc6502::IZX() { // Indirect X mode
+	uint16_t t = read(pc);
+	pc++;
+
+	uint16_t lo = read((uint16_t)(t + (uint16_t)x) & 0x00FF);
+	uint16_t hi = read((uint16_t)(t + (uint16_t)x + 1) & 0x00FF);
+
+	addr_abs = (hi << 8) | lo;
+
+	return 0
+}
+
+uint8_t olc6502::IZY() { // Indirect Y mode (dieser modus funktioniert anders als der IZX!
+	uint16_t t = read(pc);
+	pc++;
+
+	uint16_t lo = read(t & 0x00FF);
+	uint16_t hi = read((t+1) & 0x00FF);
+
+	addr_abs = (hi << 8) | lo;
+	addr_abs += y;
+
+	if ((addr_abs & 0xFF00) != (hi << 8)) {
+		return 1;
+	}
+	return 0;
+}
 
