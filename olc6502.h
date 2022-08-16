@@ -59,6 +59,7 @@ public:
 	uint8_t SEC(); uint8_t SED(); uint8_t SEI(); uint8_t STA();
 	uint8_t STX(); uint8_t STY(); uint8_t TAX(); uint8_t TAY();
 	uint8_t TSX(); uint8_t TXA(); uint8_t TXS(); uint8_t TYA();
+	uint8_t XXX(); //Illegaler Opcode aufgerufen
 
 private:
 	Bus* bus = nullptr;
