@@ -64,7 +64,7 @@ void olc6502::setFlag(FLAGS6502 f, bool v)
 void olc6502::clock()
 {
 	if (cycles == 0) { // nur wenn cycles auf 0 steht neuen Opcode laden. Ansonsten ist der vorhergehende opcode noch nicht komplett verarbeitet
-		opcode = read(pc); // Opcode lesen aus dem RAM
+		opcode = read(pc); // Opcode lesen aus dem Bus
 		pc++; // Program counter +1
 
 		// Opcode Takte auslesen

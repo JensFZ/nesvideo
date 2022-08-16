@@ -2,7 +2,7 @@
 
 Bus::Bus()
 {
-	//Ram leeren
+	//Bus leeren
 	for (auto &i : ram) i = 0x00;
 
 	//CPU mit dem bus verbinden
