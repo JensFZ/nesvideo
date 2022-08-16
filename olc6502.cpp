@@ -1,4 +1,4 @@
-#include "olc6502.h"
+#7include "olc6502.h"
 #include "Bus.h"
 
 olc6502::olc6502() 
@@ -43,6 +43,24 @@ void olc6502::write(uint16_t a, uint8_t d)
 	bus->write(a, d);
 }
 
+// gibt den wert des angegebenen flags des statusregisters zurück
+uint8_t olc6502::getFlag(FLAGS6502 f)
+{
+	return ((status & f) > 0 ? 1: 0);
+}
+
+// Setzt oder leert das angegebene bit des status registers
+void olc6502::setFlag(FLAGS6502 f, bool v)
+{
+	if (v) {
+		status |= f;
+	}
+	else {
+		status &= ~f;
+	}
+
+}
+
 void olc6502::clock()
 {
 	if (cycles == 0) { // nur wenn cycles auf 0 steht neuen Opcode laden. Ansonsten ist der vorhergehende opcode noch nicht komplett verarbeitet
@@ -60,3 +78,5 @@ void olc6502::clock()
 
 	cycles--;
 }
+
+
