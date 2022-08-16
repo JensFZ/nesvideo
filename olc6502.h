@@ -38,7 +38,7 @@ public:
 		bus = n;
 	}
 
-	// Addressing Modes
+	// Addressing Modes, gibt die anzahl der zusätzlichen Taktzyklen zurück.
 	uint8_t IMP(); uint8_t IMM();
 	uint8_t ZP0(); uint8_t ZPX();
 	uint8_t ZPY(); uint8_t REL();
@@ -46,7 +46,8 @@ public:
 	uint8_t ABY(); uint8_t IND();
 	uint8_t IZX(); uint8_t IZY();
 
-	//Opcodes
+	//Opcodes, gibt die anzahl der zusätzlichen Taktzyklen zurück.
+	// einige Opcodes bruachen z.B. mindestens 4 takte, können aber auch mehr brauchen
 	uint8_t ADC(); uint8_t AND(); uint8_t ASL(); uint8_t BCC();
 	uint8_t BCS(); uint8_t BEQ(); uint8_t BIT(); uint8_t BMI();
 	uint8_t BNE(); uint8_t BPL(); uint8_t BRK(); uint8_t BVC();
@@ -74,7 +75,7 @@ public:
 	uint16_t addr_abs = 0x0000; // Absolute Adresse
 	uint16_t addr_rel = 0x0000; // Relative Adresse
 	uint8_t opcode = 0x00;		// Opcode
-	uint8_t cycles = 0;			// gelaufene Takte
+	uint8_t cycles = 0;			// Takte, die der aktuelle Opcode noch zu erledigen hat, bevor der nächste opcode geladen werden kann
 
 private:
 	Bus* bus = nullptr;					// Datenbus
