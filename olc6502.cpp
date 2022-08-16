@@ -231,6 +231,14 @@ uint8_t olc6502::fetch()
 
 	return fetched;
 }
+
+uint8_t olc6502::AND() {
+	fetch(); // Daten lesen
+	a = a & fetched; // Bitwise AND mit A Register
+	setFlag(Z, a == 0x00); // Zero Flag setzen, wenn a = 0x00
+	setFlag(N, a & 0x80); // wenn bit 7 = 1 -> Negativ 
+	return 1; // Benötigt einen weiteren Takt
+}
 #pragma endregion
 
 
