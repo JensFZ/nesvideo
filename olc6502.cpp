@@ -237,8 +237,171 @@ uint8_t olc6502::AND() {
 	a = a & fetched; // Bitwise AND mit A Register
 	setFlag(Z, a == 0x00); // Zero Flag setzen, wenn a = 0x00
 	setFlag(N, a & 0x80); // wenn bit 7 = 1 -> Negativ 
-	return 1; // BenÃ¶tigt einen weiteren Takt
+	return 1; // Benötigt einen weiteren Takt
 }
+
+uint8_t olc6502::BCS() { // Branch if Carry Set (wenn C Flag = 1)
+	if (getFlag(C) == 1) {
+		cycles++; // Braucht einen weiteren Takt
+		addr_abs = pc + addr_rel; // Absolute Adresse auf PC + relative Adresse setzen
+
+		if ((addr_abs & 0xFF00) != (pc & 0xFF00)) { // Bei Pagewechsel einen weiteren Takt
+			cycles++; 
+		}
+
+		pc = addr_abs; // Da es ein Branch (JUMP) wird der PC auf die nächste Adresse gesetzt
+	}
+	return 0;
+}
+
+uint8_t olc6502::BCC() { //  Branch if Carry Clear (wenn C Flag = 0)
+	if (getFlag(C) == 0) {
+		cycles++; // Braucht einen weiteren Takt
+		addr_abs = pc + addr_rel; // Absolute Adresse auf PC + relative Adresse setzen
+
+		if ((addr_abs & 0xFF00) != (pc & 0xFF00)) {
+			cycles++;
+		}
+
+		pc = addr_abs; // Da es ein Branch (JUMP) wird der PC auf die nächste Adresse gesetzt
+	}
+	return 0;
+}
+
+uint8_t olc6502::BEQ() { // Branch if Equal (Z Flag = 1)
+	if (getFlag(Z) == 1) {
+		cycles++; // Braucht einen weiteren Takt
+		addr_abs = pc + addr_rel; // Absolute Adresse auf PC + relative Adresse setzen
+
+		if ((addr_abs & 0xFF00) != (pc & 0xFF00)) {// Bei Pagewechsel einen weiteren Takt
+			cycles++;
+		}
+
+		pc = addr_abs; // Da es ein Branch (JUMP) wird der PC auf die nächste Adresse gesetzt
+	}
+	return 0;
+}
+
+uint8_t olc6502::BMI() { // Branch if Negative (wenn N Flag = 1)
+	if (getFlag(Z) == 1) {
+		cycles++; // Braucht einen weiteren Takt
+		addr_abs = pc + addr_rel; // Absolute Adresse auf PC + relative Adresse setzen
+
+		if ((addr_abs & 0xFF00) != (pc & 0xFF00)) {// Bei Pagewechsel einen weiteren Takt
+			cycles++;
+		}
+
+		pc = addr_abs; // Da es ein Branch (JUMP) wird der PC auf die nächste Adresse gesetzt
+	}
+	return 0;
+}
+
+uint8_t olc6502::BNE() { //  Branch if Not Equal (wenn Z Flag = 0)
+	if (getFlag(Z) == 0) {
+		cycles++; // Braucht einen weiteren Takt
+		addr_abs = pc + addr_rel; // Absolute Adresse auf PC + relative Adresse setzen
+
+		if ((addr_abs & 0xFF00) != (pc & 0xFF00)) {// Bei Pagewechsel einen weiteren Takt
+			cycles++;
+		}
+
+		pc = addr_abs; // Da es ein Branch (JUMP) wird der PC auf die nächste Adresse gesetzt
+	}
+	return 0;
+}
+
+uint8_t olc6502::BPL() { //  Branch if Positive (wenn N Flag = 0)
+	if (getFlag(N) == 0) {
+		cycles++; // Braucht einen weiteren Takt
+		addr_abs = pc + addr_rel; // Absolute Adresse auf PC + relative Adresse setzen
+
+		if ((addr_abs & 0xFF00) != (pc & 0xFF00)) {// Bei Pagewechsel einen weiteren Takt
+			cycles++;
+		}
+
+		pc = addr_abs; // Da es ein Branch (JUMP) wird der PC auf die nächste Adresse gesetzt
+	}
+	return 0;
+}
+
+uint8_t olc6502::BVC() { //  Branch if Overflow Clear (wenn V Flag = 0)
+	if (getFlag(V) == 0) {
+		cycles++; // Braucht einen weiteren Takt
+		addr_abs = pc + addr_rel; // Absolute Adresse auf PC + relative Adresse setzen
+
+		if ((addr_abs & 0xFF00) != (pc & 0xFF00)) {// Bei Pagewechsel einen weiteren Takt
+			cycles++;
+		}
+
+		pc = addr_abs; // Da es ein Branch (JUMP) wird der PC auf die nächste Adresse gesetzt
+	}
+	return 0;
+}
+
+uint8_t olc6502::BVS() { //  Branch if Overflow Set (wenn V Flag = 1)
+	if (getFlag(V) == 1) {
+		cycles++; // Braucht einen weiteren Takt
+		addr_abs = pc + addr_rel; // Absolute Adresse auf PC + relative Adresse setzen
+
+		if ((addr_abs & 0xFF00) != (pc & 0xFF00)) {// Bei Pagewechsel einen weiteren Takt
+			cycles++;
+		}
+
+		pc = addr_abs; // Da es ein Branch (JUMP) wird der PC auf die nächste Adresse gesetzt
+	}
+	return 0;
+}
+
+uint8_t olc6502::CLC() // Clear Carry Flag
+{
+	setFlag(C, false);
+	return 0;
+}
+
+uint8_t olc6502::CLD() // Clear Decimal Flag
+{
+	setFlag(D, false);
+	return 0;
+}
+
+uint8_t olc6502::ADC()
+{
+	fetch();
+	uint16_t temp = (uint16_t)a + (uint16_t)fetched + (uint16_t)getFlag(C);
+	setFlag(C, temp > 255); // Wenn zahl > 255 -> Carry Bit setzen
+	setFlag(Z, (temp & 0x00FF) == 0); // Wenn die Zahl = 0 ist Zero Flag setzen
+	setFlag(N, (temp & 0x80)); // wenn das 7 Bit = 1 -> Negativ Flag setzen
+
+	// Overflow ist etwas komplexer. Basierend auf folgender Tabelle:
+	//       Positive Number + Positive Number = Negative Result -> Overflow
+	//       Negative Number + Negative Number = Positive Result -> Overflow
+	//       Positive Number + Negative Number = Either Result -> Cannot Overflow
+	//       Positive Number + Positive Number = Positive Result -> OK! No Overflow
+	//       Negative Number + Negative Number = Negative Result -> OK! No Overflow
+	//
+	// und folgender Wahrheitstabelle:
+	// A  M  R | V | A^R | A^M |~(A^M) | 
+	// 0  0  0 | 0 |  0  |  0  |   1   |
+	// 0  0  1 | 1 |  1  |  0  |   1   |
+	// 0  1  0 | 0 |  0  |  1  |   0   |
+	// 0  1  1 | 0 |  1  |  1  |   0   |  so V = ~(A^M) & (A^R)
+	// 1  0  0 | 0 |  1  |  1  |   0   |
+	// 1  0  1 | 0 |  0  |  1  |   0   |
+	// 1  1  0 | 1 |  1  |  0  |   1   |
+	// 1  1  1 | 0 |  0  |  0  |   1   |
+
+	// geht die folgende Zeile aus
+	setFlag(V, (~((uint16_t)a ^ (uint16_t)fetched) & ((uint16_t)a ^ (uint16_t)temp)) & 0x0080);
+
+	a = temp & 0x00FF; // Ergebnis wieder ins A Register schreiben
+}
+
+uint8_t olc6502::SBC()
+{
+
+}
+
+
 #pragma endregion
 
 
