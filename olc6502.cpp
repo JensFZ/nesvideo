@@ -57,4 +57,6 @@ void olc6502::clock()
 
 		cycles += (additional_cycle1 & additional_cycle2); // zusätzliche takte auf die Cycles draufrechnen (im tutorial ist hier ein &, muss ggf. nochmal gedebugt werden)
 	}
+
+	cycles--;
 }
