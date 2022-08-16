@@ -36,7 +36,10 @@ public:
 
 private:
 	Bus* bus = nullptr;
-	uint8_t read(uint16_t a);
-	void write(uint16_t a, uint8_t d);
+	uint8_t read(uint16_t a); // Adresse lesen
+	void write(uint16_t a, uint8_t d); // Adresse schreiben
+
+	uint8_t getFlag(FLAGS6502 f); // Flag lesen
+	void	setFlag(FLAGS6502 f, bool v); // Flag setzen
 };
 
