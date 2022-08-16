@@ -394,13 +394,26 @@ uint8_t olc6502::ADC()
 	setFlag(V, (~((uint16_t)a ^ (uint16_t)fetched) & ((uint16_t)a ^ (uint16_t)temp)) & 0x0080);
 
 	a = temp & 0x00FF; // Ergebnis wieder ins A Register schreiben
+	return 1;
 }
 
 uint8_t olc6502::SBC()
 {
+	fetch();
 
+
+	// das untereg byte muss für die Subtraction invertiert werden
+	uint16_t value = ((uint16_t)fetched) ^ 0x00FF;
+
+	// durch das invertieren ist es quasi eine Adition
+	uint16_t temp = (uint16_t)a + value + (uint16_t)getFlag(C);
+	setFlag(C, temp & 0xFF00);
+	setFlag(Z, ((temp & 0x00FF) == 0));
+	setFlag(V, (temp ^ (uint16_t)a) & (temp ^ value) & 0x0080);
+	setFlag(N, temp & 0x0080);
+	a = temp & 0x00FF;
+	return 1;
 }
-
 
 #pragma endregion
 
