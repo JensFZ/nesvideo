@@ -6,7 +6,10 @@ olc6502::olc6502()
 	using a = olc6502; // nur da um die nachfolgende Tabelle etwas kürzer zu gestallten, ansonsten müsste anstelle von &a:: &olc6502:: jedesmal stehen
 
 	// Abbildung der Grafik auf Seite 22 der Dokumentation des 6502 CPUs (zu finden im Ordner Docs\CPU)
-	lookup = { // {name, opcode, Adressingmode, Taktzyclen}
+	lookup = { 
+		// {name, opcode, Adressingmode, Taktzyclen}
+		// Dadurch wird jeder opcode einen hexwert zugewiesen. BRK = 0x00, ORA = 0x01, ...
+		// Dies ermöglicht, dass man den Hexwert aus dem Ram direkt als index des Arrays verwendet
 		{ "BRK", &a::BRK, &a::IMM, 7 },{ "ORA", &a::ORA, &a::IZX, 6 },{ "???", &a::XXX, &a::IMP, 2 },{ "???", &a::XXX, &a::IMP, 8 },{ "???", &a::NOP, &a::IMP, 3 },{ "ORA", &a::ORA, &a::ZP0, 3 },{ "ASL", &a::ASL, &a::ZP0, 5 },{ "???", &a::XXX, &a::IMP, 5 },{ "PHP", &a::PHP, &a::IMP, 3 },{ "ORA", &a::ORA, &a::IMM, 2 },{ "ASL", &a::ASL, &a::IMP, 2 },{ "???", &a::XXX, &a::IMP, 2 },{ "???", &a::NOP, &a::IMP, 4 },{ "ORA", &a::ORA, &a::ABS, 4 },{ "ASL", &a::ASL, &a::ABS, 6 },{ "???", &a::XXX, &a::IMP, 6 },
 		{ "BPL", &a::BPL, &a::REL, 2 },{ "ORA", &a::ORA, &a::IZY, 5 },{ "???", &a::XXX, &a::IMP, 2 },{ "???", &a::XXX, &a::IMP, 8 },{ "???", &a::NOP, &a::IMP, 4 },{ "ORA", &a::ORA, &a::ZPX, 4 },{ "ASL", &a::ASL, &a::ZPX, 6 },{ "???", &a::XXX, &a::IMP, 6 },{ "CLC", &a::CLC, &a::IMP, 2 },{ "ORA", &a::ORA, &a::ABY, 4 },{ "???", &a::NOP, &a::IMP, 2 },{ "???", &a::XXX, &a::IMP, 7 },{ "???", &a::NOP, &a::IMP, 4 },{ "ORA", &a::ORA, &a::ABX, 4 },{ "ASL", &a::ASL, &a::ABX, 7 },{ "???", &a::XXX, &a::IMP, 7 },
 		{ "JSR", &a::JSR, &a::ABS, 6 },{ "AND", &a::AND, &a::IZX, 6 },{ "???", &a::XXX, &a::IMP, 2 },{ "???", &a::XXX, &a::IMP, 8 },{ "BIT", &a::BIT, &a::ZP0, 3 },{ "AND", &a::AND, &a::ZP0, 3 },{ "ROL", &a::ROL, &a::ZP0, 5 },{ "???", &a::XXX, &a::IMP, 5 },{ "PLP", &a::PLP, &a::IMP, 4 },{ "AND", &a::AND, &a::IMM, 2 },{ "ROL", &a::ROL, &a::IMP, 2 },{ "???", &a::XXX, &a::IMP, 2 },{ "BIT", &a::BIT, &a::ABS, 4 },{ "AND", &a::AND, &a::ABS, 4 },{ "ROL", &a::ROL, &a::ABS, 6 },{ "???", &a::XXX, &a::IMP, 6 },
@@ -38,4 +41,22 @@ uint8_t olc6502::read(uint16_t a)
 void olc6502::write(uint16_t a, uint8_t d)
 {
 	bus->write(a, d);
+}
+
+void olc6502::clock()
+{
+	if (cycles == 0) { // nur wenn cycles auf 0 steht neuen Opcode laden. Ansonsten ist der vorhergehende opcode noch nicht komplett verarbeitet
+		opcode = read(pc); // Opcode lesen aus dem RAM
+		pc++; // Program counter +1
+
+		// Opcode Takte auslesen
+		cycles = lookup[opcode].cycles;
+
+		(this->*lookup[opcode].addrmode)(); // Adressmode funktion aufrufen
+
+		(this->*lookup[opcode].operate)(); // Oppcode funktion aufrufen
+
+
+
+	}
 }
