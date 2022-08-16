@@ -52,11 +52,9 @@ void olc6502::clock()
 		// Opcode Takte auslesen
 		cycles = lookup[opcode].cycles;
 
-		(this->*lookup[opcode].addrmode)(); // Adressmode funktion aufrufen
+		uint8_t additional_cycle1 = (this->*lookup[opcode].addrmode)(); // Adressmode funktion aufrufen
+		uint8_t additional_cycle2 = (this->*lookup[opcode].operate)(); // Oppcode funktion aufrufen
 
-		(this->*lookup[opcode].operate)(); // Oppcode funktion aufrufen
-
-
-
+		cycles += (additional_cycle1 & additional_cycle2); // zusätzliche takte auf die Cycles draufrechnen (im tutorial ist hier ein &, muss ggf. nochmal gedebugt werden)
 	}
 }
