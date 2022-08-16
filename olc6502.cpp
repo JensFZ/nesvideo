@@ -80,7 +80,7 @@ void olc6502::clock()
 }
 
 
-// Addressing Modes
+#pragma region Addressing Modes
 
 uint8_t olc6502::IMP() // Implied -> keine Daten angegeben aber A register könnte benötigt werden
 {
@@ -220,4 +220,5 @@ uint8_t olc6502::IZY() { // Indirect Y mode (dieser modus funktioniert anders al
 	}
 	return 0;
 }
+#pragma endregion
 
