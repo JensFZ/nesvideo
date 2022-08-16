@@ -202,7 +202,7 @@ uint8_t olc6502::IZX() { // Indirect X mode
 
 	addr_abs = (hi << 8) | lo;
 
-	return 0
+	return 0;
 }
 
 uint8_t olc6502::IZY() { // Indirect Y mode (dieser modus funktioniert anders als der IZX!
