@@ -61,25 +61,25 @@ public:
 	uint8_t TSX(); uint8_t TXA(); uint8_t TXS(); uint8_t TYA();
 	uint8_t XXX(); //Illegaler Opcode aufgerufen
 
-	void clock();
-	void reset();
-	void irq();
-	void nmi();
+	void clock(); // Takt
+	void reset(); // CPU Reset
+	void irq();   // Interrupt
+	void nmi();   // Non maskable Interrupt
 
-	uint8_t fetch();
-	uint8_t fetched = 0x00;
+	uint8_t fetch();		// Daten lesen
+	uint8_t fetched = 0x00; // Daten ablegen
 
-	uint16_t addr_abs = 0x0000;
-	uint16_t addr_rel = 0x0000;
-	uint8_t opcode = 0x00;
-	uint8_t cycles = 0;
+	uint16_t addr_abs = 0x0000; // Absolute Adresse
+	uint16_t addr_rel = 0x0000; // Relative Adresse
+	uint8_t opcode = 0x00;		// Opcode
+	uint8_t cycles = 0;			// gelaufene Takte
 
 private:
-	Bus* bus = nullptr;
-	uint8_t read(uint16_t a); // Adresse lesen
+	Bus* bus = nullptr;					// Datenbus
+	uint8_t read(uint16_t a);			// Adresse lesen
 	void write(uint16_t a, uint8_t d); // Adresse schreiben
 
-	uint8_t getFlag(FLAGS6502 f); // Flag lesen
-	void	setFlag(FLAGS6502 f, bool v); // Flag setzen
+	uint8_t getFlag(FLAGS6502 f);			// Flag lesen
+	void	setFlag(FLAGS6502 f, bool v);	// Flag setzen
 };
 
