@@ -4,6 +4,9 @@ Bus::Bus()
 {
 	//Ram leeren
 	for (auto &i : ram) i = 0x00;
+
+	//CPU mit dem bus verbinden
+	cpu.ConnectBus(this);
 }
 
 Bus::~Bus()
