@@ -498,6 +498,15 @@ uint8_t olc6502::CMP() //Compare Accumulator
 	return 1;
 }
 
+uint8_t olc6502::CPX() // Compare X Register
+{
+	fetch();
+	temp = (uint16_t)x - (uint16_t)fetched;
+	setFlag(C, x >= fetched);
+	setFlag(Z, (temp * 0x00FF) == 0x0000);
+	setFlag(N, (temp) & 0x0080);
+	return 0;
+}
 uint8_t olc6502::ADC()
 {
 	fetch();
