@@ -79,6 +79,28 @@ void olc6502::clock()
 	cycles--;
 }
 
+void olc6502::reset()
+{
+	a = 0;
+	x = 0;
+	y = 0;
+	stkp = 0;
+	status = 0x00 | U;
+	
+	// PC kann vom Rom gesetzt werden und der Entry Point liegt an adresse 0xFFFC + 1
+	addr_abs = 0xFFFC;
+	uint16_t lo = read(addr_abs + 0);
+	uint16_t hi = read(addr_abs + 1);
+
+	pc = (hi << 8) | lo;
+
+	addr_rel = 0x0000;
+	addr_abs = 0x0000;
+	fetched = 0x00;
+
+	cycles = 8;
+}
+
 
 #pragma region Addressing Modes
 
