@@ -148,6 +148,7 @@ void olc6502::nmi()
 
 }
 
+
 #pragma region Addressing Modes
 
 uint8_t olc6502::IMP() // Implied -> keine Daten angegeben aber A register könnte benötigt werden
@@ -319,6 +320,20 @@ uint8_t olc6502::BCS() { // Branch if Carry Set (wenn C Flag = 1)
 
 		pc = addr_abs; // Da es ein Branch (JUMP) wird der PC auf die nächste Adresse gesetzt
 	}
+	return 0;
+}
+
+uint8_t olc6502::ASL() //Instruction: Arithmetic Shift Left
+{
+	fetch();
+	uint16_t temp = (uint16_t)fetched << 1;
+	setFlag(C, (temp & 0xFF00) > 0);
+	setFlag(Z, (temp & 0x00FF) == 0x00);
+	setFlag(N, temp & 0x80);
+	if (lookup[opcode].addrmode == &olc6502::IMP)
+		a = temp & 0x00FF;
+	else
+		write(addr_abs, temp & 0x00FF);
 	return 0;
 }
 
