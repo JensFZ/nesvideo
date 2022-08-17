@@ -417,6 +417,25 @@ uint8_t olc6502::BPL() { //  Branch if Positive (wenn N Flag = 0)
 	return 0;
 }
 
+uint8_t olc6502::BRK() // Break
+{
+	pc++;
+
+	setFlag(I, 1);
+	write(0x0100 + stkp, (pc >> 8) & 0x00FF);
+	stkp--;
+	write(0x0100 + stkp, pc & 0x00FF);
+	stkp--;
+
+	setFlag(B, 1);
+	write(0x0100 + stkp, status);
+	stkp--;
+	setFlag(B, 0);
+
+	pc = (uint16_t)read(0xFFFE) | ((uint16_t)read(0xFFFF) << 8);
+	return 0;
+}
+
 uint8_t olc6502::BVC() { //  Branch if Overflow Clear (wenn V Flag = 0)
 	if (getFlag(V) == 0) {
 		cycles++; // Braucht einen weiteren Takt
