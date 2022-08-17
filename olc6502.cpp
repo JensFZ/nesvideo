@@ -580,6 +580,12 @@ uint8_t olc6502::INY()
 	return 0;
 }
 
+uint8_t olc6502::JMP()
+{
+	pc = addr_abs;
+	return 0;
+}
+
 uint8_t olc6502::ADC()
 {
 	fetch();
