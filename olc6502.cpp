@@ -527,8 +527,13 @@ uint8_t olc6502::DEC() // Decrement Value at Memory Location
 	setFlag(N, temp & 0x0080);
 	return 0;
 }
+
+uint8_t olc6502::DEX() // Decrement X Register
 {
-	return uint8_t();
+	x--;
+	setFlag(Z, x == 0x0000);
+	setFlag(N, x & 0x0080);
+	return 0;
 }
 
 uint8_t olc6502::ADC()
