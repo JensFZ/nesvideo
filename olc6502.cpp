@@ -507,6 +507,22 @@ uint8_t olc6502::CPX() // Compare X Register
 	setFlag(N, (temp) & 0x0080);
 	return 0;
 }
+
+uint8_t olc6502::CPY()
+{
+	fetch();
+	temp = (uint16_t)y - (uint16_t)fetched;
+	setFlag(C, y >= fetched);
+	setFlag(Z, (temp * 0x00FF) == 0x0000);
+	setFlag(N, (temp) & 0x0080);
+	return 0;
+}
+
+uint8_t olc6502::DEC()
+{
+	return uint8_t();
+}
+
 uint8_t olc6502::ADC()
 {
 	fetch();
