@@ -544,6 +544,15 @@ uint8_t olc6502::DEY()
 	return 0;
 }
 
+uint8_t olc6502::EOR() // Bitwise Logic XOR
+{
+	fetch();
+	a = a ^ fetched;
+	setFlag(Z, a == 0x00);
+	setFlag(N, a & 0x80);
+	return 1;
+}
+
 uint8_t olc6502::ADC()
 {
 	fetch();
