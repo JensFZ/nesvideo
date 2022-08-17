@@ -536,6 +536,14 @@ uint8_t olc6502::DEX() // Decrement X Register
 	return 0;
 }
 
+uint8_t olc6502::DEY()
+{
+	y--;
+	setFlag(Z, y == 0x0000);
+	setFlag(N, x & 0x0080);
+	return 0;
+}
+
 uint8_t olc6502::ADC()
 {
 	fetch();
