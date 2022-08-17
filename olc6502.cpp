@@ -488,6 +488,16 @@ uint8_t olc6502::CLV() // Clear Overflow Flag
 	return 0;
 }
 
+uint8_t olc6502::CMP() //Compare Accumulator
+{
+	fetch();
+	temp = (uint16_t)a - (uint16_t)fetched;
+	setFlag(C, a >= fetched);
+	setFlag(Z, (temp & 0x00FF) == 0x0000);
+	setFlag(N, (temp) & 0x0080);
+	return 1;
+}
+
 uint8_t olc6502::ADC()
 {
 	fetch();
