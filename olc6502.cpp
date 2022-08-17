@@ -571,6 +571,15 @@ uint8_t olc6502::INX()
 	setFlag(N, x & 0x80);
 	return 0;
 }
+
+uint8_t olc6502::INY()
+{
+	y++;
+	setFlag(Z, y == 0x00);
+	setFlag(N, x & 0x80);
+	return 0;
+}
+
 uint8_t olc6502::ADC()
 {
 	fetch();
