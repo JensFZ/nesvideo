@@ -564,6 +564,13 @@ uint8_t olc6502::INC()
 
 }
 
+uint8_t olc6502::INX()
+{
+	x++;
+	setFlag(Z, x == 0x00);
+	setFlag(N, x & 0x80);
+	return 0;
+}
 uint8_t olc6502::ADC()
 {
 	fetch();
