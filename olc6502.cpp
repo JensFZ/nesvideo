@@ -465,6 +465,22 @@ uint8_t olc6502::ADC()
 	return 1;
 }
 
+uint8_t olc6502::RTI()
+{
+	stkp++;
+	status = read(0x0100 + stkp);
+	status &= ~B;
+	status &= ~U;
+
+	stkp++;
+	pc = (uint16_t)read(0x0100 + stkp);
+	stkp++;
+	pc |= (uint16_t)read(0x0100 + stkp) << 8;
+
+	return 0;
+
+}
+
 uint8_t olc6502::SBC()
 {
 	fetch();
