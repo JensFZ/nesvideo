@@ -518,7 +518,15 @@ uint8_t olc6502::CPY()
 	return 0;
 }
 
-uint8_t olc6502::DEC()
+uint8_t olc6502::DEC() // Decrement Value at Memory Location
+{
+	fetch();
+	temp = fetched - 1;
+	write(addr_abs, temp & 0x00FF);
+	setFlag(Z, (temp & 0x00FF) == 0x0000);
+	setFlag(N, temp & 0x0080);
+	return 0;
+}
 {
 	return uint8_t();
 }
