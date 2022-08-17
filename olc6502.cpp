@@ -553,6 +553,17 @@ uint8_t olc6502::EOR() // Bitwise Logic XOR
 	return 1;
 }
 
+uint8_t olc6502::INC()
+{
+	fetch();
+	temp = fetched + 1;
+	write(addr_abs, temp & 0x00FF);
+	setFlag(Z, (temp & 0x00FF) == 0x0000);
+	setFlag(N, temp & 0x0080);
+	return 0;
+
+}
+
 uint8_t olc6502::ADC()
 {
 	fetch();
