@@ -586,6 +586,19 @@ uint8_t olc6502::JMP()
 	return 0;
 }
 
+uint8_t olc6502::JSR() // Jump To Sub-Routine
+{
+	pc--;
+
+	write(0x0100 + stkp, (pc >> 8) & 0x00FF);
+	stkp--;
+	write(0x0100 + stkp, pc & 0x00FF);
+	stkp--;
+
+	pc = addr_abs;
+	return 0;
+}
+
 uint8_t olc6502::ADC()
 {
 	fetch();
