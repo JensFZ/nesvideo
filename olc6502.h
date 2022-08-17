@@ -71,6 +71,7 @@ public:
 
 	uint8_t fetch();		// Daten lesen
 	uint8_t fetched = 0x00; // Daten ablegen
+	uint16_t temp = 0x0000;
 
 	uint16_t addr_abs = 0x0000; // Absolute Adresse
 	uint16_t addr_rel = 0x0000; // Relative Adresse

@@ -326,7 +326,7 @@ uint8_t olc6502::BCS() { // Branch if Carry Set (wenn C Flag = 1)
 uint8_t olc6502::ASL() //Instruction: Arithmetic Shift Left
 {
 	fetch();
-	uint16_t temp = (uint16_t)fetched << 1;
+	temp = (uint16_t)fetched << 1;
 	setFlag(C, (temp & 0xFF00) > 0);
 	setFlag(Z, (temp & 0x00FF) == 0x00);
 	setFlag(N, temp & 0x80);
@@ -362,6 +362,16 @@ uint8_t olc6502::BEQ() { // Branch if Equal (Z Flag = 1)
 
 		pc = addr_abs; // Da es ein Branch (JUMP) wird der PC auf die nächste Adresse gesetzt
 	}
+	return 0;
+}
+
+uint8_t olc6502::BIT()
+{
+	fetch();
+	temp = a & fetched;
+	setFlag(Z, (temp & 0x00FF) == 0x00);
+	setFlag(N, fetched & (1 << 7));
+	setFlag(V, fetched & (1 << 6));
 	return 0;
 }
 
@@ -450,7 +460,7 @@ uint8_t olc6502::CLD() // Clear Decimal Flag
 uint8_t olc6502::ADC()
 {
 	fetch();
-	uint16_t temp = (uint16_t)a + (uint16_t)fetched + (uint16_t)getFlag(C);
+	temp = (uint16_t)a + (uint16_t)fetched + (uint16_t)getFlag(C);
 	setFlag(C, temp > 255); // Wenn zahl > 255 -> Carry Bit setzen
 	setFlag(Z, (temp & 0x00FF) == 0); // Wenn die Zahl = 0 ist Zero Flag setzen
 	setFlag(N, (temp & 0x80)); // wenn das 7 Bit = 1 -> Negativ Flag setzen
@@ -505,7 +515,7 @@ uint8_t olc6502::SBC()
 	uint16_t value = ((uint16_t)fetched) ^ 0x00FF;
 
 	// durch das invertieren ist es quasi eine Adition
-	uint16_t temp = (uint16_t)a + value + (uint16_t)getFlag(C);
+	temp = (uint16_t)a + value + (uint16_t)getFlag(C);
 	setFlag(C, temp & 0xFF00);
 	setFlag(Z, ((temp & 0x00FF) == 0));
 	setFlag(V, (temp ^ (uint16_t)a) & (temp ^ value) & 0x0080);
