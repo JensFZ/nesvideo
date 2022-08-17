@@ -125,6 +125,28 @@ void olc6502::irq()
 	}
 }
 
+void olc6502::nmi()
+{
+	write(0x0100 + stkp, (pc >> 8) & 0x00FF);
+	stkp--;
+
+	write(0x0100 + stkp, pc & 0x00FF);
+	stkp--;
+
+	setFlag(B, 0);
+	setFlag(U, 1);
+	setFlag(I, 1);
+	write(0x0100 + stkp, status);
+	stkp--;
+
+	addr_abs = 0xFFFA;
+	uint16_t lo = read(addr_abs + 0);
+	uint16_t hi = read(addr_abs + 1);
+	pc = (hi << 8) | lo;
+
+	cycles = 8;
+
+}
 
 #pragma region Addressing Modes
 
