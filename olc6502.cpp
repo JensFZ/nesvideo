@@ -481,6 +481,13 @@ uint8_t olc6502::CLI() // Clear Interrupt Flag
 	setFlag(I, false);
 	return 0;
 }
+
+uint8_t olc6502::CLV() // Clear Overflow Flag
+{
+	setFlag(V, false);
+	return 0;
+}
+
 uint8_t olc6502::ADC()
 {
 	fetch();
