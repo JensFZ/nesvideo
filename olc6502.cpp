@@ -599,6 +599,14 @@ uint8_t olc6502::JSR() // Jump To Sub-Routine
 	return 0;
 }
 
+uint8_t olc6502::LDA() // Load The Accumulator
+{
+	fetch();
+	a = fetched;
+	setFlag(Z, a == 0x00);
+	setFlag(N, a & 0x80);
+	return 1;
+}
 uint8_t olc6502::ADC()
 {
 	fetch();
