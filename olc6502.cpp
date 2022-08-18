@@ -607,6 +607,16 @@ uint8_t olc6502::LDA() // Load The Accumulator
 	setFlag(N, a & 0x80);
 	return 1;
 }
+
+uint8_t olc6502::LDX() // Load The X Register
+{
+	fetch();
+	x = fetched;
+	setFlag(Z, a == 0x00);
+	setFlag(N, a & 0x80);
+	return 1;
+}
+
 uint8_t olc6502::ADC()
 {
 	fetch();
