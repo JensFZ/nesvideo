@@ -79,6 +79,14 @@ public:
 	uint8_t opcode = 0x00;		// Opcode
 	uint8_t cycles = 0;			// Takte, die der aktuelle Opcode noch zu erledigen hat, bevor der nächste opcode geladen werden kann
 
+#pragma region Debug
+	bool complete();
+
+	std::map<uint16_t, std::string> disassemble(uint16_t nStart, uint16_t nStop);
+
+#pragma endregion
+
+
 private:
 	Bus* bus = nullptr;					// Datenbus
 	uint8_t read(uint16_t a);			// Adresse lesen
@@ -96,10 +104,6 @@ private:
 
 	std::vector<INSTRUCTION> lookup;
 
-#pragma region Debug
-	std::map<uint16_t, std::string> disassemble(uint16_t nStart, uint16_t nStop);
-
-#pragma endregion
 
 };
 

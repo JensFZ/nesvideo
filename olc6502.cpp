@@ -61,6 +61,11 @@ void olc6502::setFlag(FLAGS6502 f, bool v)
 
 }
 
+bool olc6502::complete()
+{
+	return cycles == 0;
+}
+
 // This is the disassembly function. Its workings are not required for emulation.
 // It is merely a convenience function to turn the binary instruction code into
 // human readable form. Its included as part of the emulator because it can take
@@ -209,7 +214,7 @@ void olc6502::reset()
 	a = 0;
 	x = 0;
 	y = 0;
-	stkp = 0;
+	stkp = 0xFD;
 	status = 0x00 | U;
 	
 	// PC kann vom Rom gesetzt werden und der Entry Point liegt an adresse 0xFFFC + 1
@@ -737,17 +742,17 @@ uint8_t olc6502::LDX() // Load The X Register
 {
 	fetch();
 	x = fetched;
-	setFlag(Z, a == 0x00);
-	setFlag(N, a & 0x80);
+	setFlag(Z, x == 0x00);
+	setFlag(N, x & 0x80);
 	return 1;
 }
 
 uint8_t olc6502::LDY() // Load The X Register
 {
 	fetch();
-	x = fetched;
-	setFlag(Z, a == 0x00);
-	setFlag(N, a & 0x80);
+	y = fetched;
+	setFlag(Z, y == 0x00);
+	setFlag(N, y & 0x80);
 	return 1;
 }
 
