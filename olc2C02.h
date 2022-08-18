@@ -1,11 +1,13 @@
 #pragma once
 #include <cstdint>
+#include "Cartridge.h"
+#include <memory>
+
 class olc2C02
 {
 public:
 	olc2C02();
 	~olc2C02();
-
 
 private:
 	// Speicher:
