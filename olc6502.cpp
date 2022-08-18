@@ -719,6 +719,24 @@ uint8_t olc6502::SBC()
 	return 1;
 }
 
+uint8_t olc6502::SEC() // Set Carry Flag
+{
+	setFlag(C, true);
+	return 0;
+}
+
+uint8_t olc6502::SED() // Set Decimal Flag
+{
+	setFlag(D, true);
+	return 0;
+}
+
+uint8_t olc6502::SEI() // Set Interrupt Flag
+{
+	setFlag(I, true);
+	return 0;
+}
+
 uint8_t olc6502::LSR()
 {
 	fetch();
