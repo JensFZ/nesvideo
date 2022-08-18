@@ -852,3 +852,19 @@ uint8_t olc6502::STY() // Store X Register at Address
 	write(addr_abs, y);
 	return 0;
 }
+
+uint8_t olc6502::TAX() // Transfer Accumulator to X Register
+{
+	x = a;
+	setFlag(Z, x == 0x00);
+	setFlag(N, x & 0x00);
+	return 0;
+}
+
+uint8_t olc6502::TAY()
+{
+	y = a;
+	setFlag(Z, y == 0x00);
+	setFlag(N, x & 0x00);
+	return 0;
+}
