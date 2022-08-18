@@ -762,4 +762,7 @@ uint8_t olc6502::PLA() {// Pop Accumulator off Stack
 
 #pragma endregion
 
-
+uint8_t olc6502::XXX() // Illigaler opcode verwendet
+{
+	return 0;
+}
