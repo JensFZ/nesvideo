@@ -868,3 +868,11 @@ uint8_t olc6502::TAY()
 	setFlag(N, x & 0x00);
 	return 0;
 }
+
+uint8_t olc6502::TSX() // Transfer Stack Pointer to X Register
+{
+	x = stkp;
+	setFlag(Z, x == 0x00);
+	setFlag(N, x & 0x80);
+	return 0;
+}
