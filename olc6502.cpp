@@ -750,12 +750,21 @@ uint8_t olc6502::PHP() // Push Status Register to Stack
 	stkp--;
 	return 0;
 }
+
 uint8_t olc6502::PLA() {// Pop Accumulator off Stack
 	stkp++; // Stackpointer +1
 	a = read(0x0100 + stkp); // Daten lesen
 	setFlag(Z, a == 0x00); // Wenn Zero -> Z Flag setzen
 	setFlag(N, a & 0x80); // Wenn Negativ N Flag setzen
 
+	return 0;
+}
+
+uint8_t olc6502::PLP() // Pop Status Register off Stack
+{
+	stkp++;
+	status = read(0x0100 + stkp);
+	setFlag(U, 1);
 	return 0;
 }
 
