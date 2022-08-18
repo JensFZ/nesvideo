@@ -1,4 +1,6 @@
+#include <memory>
 #include "olc2C02.h"
+#include "Cartridge.h"
 
 uint8_t olc2C02::cpuRead(uint16_t addr, bool rdonly)
 {
@@ -60,4 +62,9 @@ void olc2C02::ppuWrite(uint16_t addr, uint8_t data)
 {
     addr &= 0x3FFF;
 
+}
+
+void olc2C02::ConnectCartridge(const std::shared_ptr<Cartridge>& cartridge)
+{
+    this->cart = cartridge;
 }
