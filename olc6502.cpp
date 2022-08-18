@@ -710,6 +710,23 @@ uint8_t olc6502::LSR()
 
 	return 0;
 }
+
+uint8_t olc6502::NOP()
+{
+	// Es gibt unterschiedliche interpretierungen der NOP's 
+	switch (opcode) {
+	case 0x1C:
+	case 0x3C:
+	case 0x5C:
+	case 0x7C:
+	case 0xDC:
+	case 0xFC:
+		return 1;
+		break;
+	}
+	return 0;
+}
+
 uint8_t olc6502::PHA() { //Push Accumulator to Stack
 	write(0x0100 + stkp, a); //0x0100 ist die Stack Adresse
 	stkp--; // Stackpointer -1
