@@ -693,6 +693,23 @@ uint8_t olc6502::SBC()
 	return 1;
 }
 
+uint8_t olc6502::LSR()
+{
+	fetch();
+	setFlag(C, fetched & 0x0001);
+	temp = fetched >> 1;
+	
+	setFlag(Z, (temp & 0x00FF) == 0x0000);
+	setFlag(N, temp & 0x0080);
+	
+	if (lookup[opcode].addrmode == &olc6502::IMP) {
+		a = temp & 0x00FF;
+	} else {
+		write(addr_abs, temp & 0x00FF);
+	}
+
+	return 0;
+}
 uint8_t olc6502::PHA() { //Push Accumulator to Stack
 	write(0x0100 + stkp, a); //0x0100 ist die Stack Adresse
 	stkp--; // Stackpointer -1
