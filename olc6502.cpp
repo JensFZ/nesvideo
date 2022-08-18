@@ -617,6 +617,15 @@ uint8_t olc6502::LDX() // Load The X Register
 	return 1;
 }
 
+uint8_t olc6502::LDY() // Load The X Register
+{
+	fetch();
+	x = fetched;
+	setFlag(Z, a == 0x00);
+	setFlag(N, a & 0x80);
+	return 1;
+}
+
 uint8_t olc6502::ADC()
 {
 	fetch();
