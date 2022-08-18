@@ -737,6 +737,12 @@ uint8_t olc6502::SEI() // Set Interrupt Flag
 	return 0;
 }
 
+uint8_t olc6502::STA()
+{
+	write(addr_abs, a);
+	return 0;
+}
+
 uint8_t olc6502::LSR()
 {
 	fetch();
