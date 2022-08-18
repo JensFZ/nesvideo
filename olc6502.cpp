@@ -742,6 +742,14 @@ uint8_t olc6502::PHA() { //Push Accumulator to Stack
 	return 0;
 }
 
+uint8_t olc6502::PHP() // Push Status Register to Stack
+{
+	write(0x0100 + stkp, status | B | U);
+	setFlag(B, 0);
+	setFlag(U, 0);
+	stkp--;
+	return 0;
+}
 uint8_t olc6502::PLA() {// Pop Accumulator off Stack
 	stkp++; // Stackpointer +1
 	a = read(0x0100 + stkp); // Daten lesen
