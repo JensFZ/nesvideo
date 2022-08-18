@@ -14,6 +14,7 @@ private:
 	uint8_t	tblPattern[2][4096]; // wird eigentlich nicht benötigt, da es in der Cartridge eigentlich sitzt
 
 
+public:
 	uint8_t cpuRead(uint16_t addr, bool rdonly = false);
 	void	cpuWrite(uint16_t addr, uint8_t data);
 
