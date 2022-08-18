@@ -727,6 +727,15 @@ uint8_t olc6502::NOP()
 	return 0;
 }
 
+uint8_t olc6502::ORA() // Bitwise Logic OR
+{
+	fetch();
+	a = a | fetched;
+	setFlag(Z, a == 0x00);
+	setFlag(N, a & 0x80);
+	return 1;
+}
+
 uint8_t olc6502::PHA() { //Push Accumulator to Stack
 	write(0x0100 + stkp, a); //0x0100 ist die Stack Adresse
 	stkp--; // Stackpointer -1
