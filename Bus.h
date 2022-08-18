@@ -27,5 +27,9 @@ public:
 	void insertCartridge(const std::shared_ptr<Cartridge>& cartridge);
 	void reset();
 	void clock();
+
+private:
+	//Taktzähler
+	uint32_t nSystemClockCounter = 0;
 };
 
