@@ -675,6 +675,21 @@ uint8_t olc6502::RTI()
 
 }
 
+uint8_t olc6502::ROR()
+{
+	fetch();
+	temp = (uint16_t)(getFlag(C) << 7) | (fetched >> 1);
+	setFlag(C, fetched & 0x01);
+	setFlag(Z, (temp & 0x00FF) == 0x00);
+	setFlag(N, temp & 0x0080);
+	if (lookup[opcode].addrmode == &olc6502::IMP) {
+		a = temp & 0x00FF;
+	} else {
+		write(addr_abs, temp & 0x00FF);
+	}
+	return 0;
+}
+
 uint8_t olc6502::SBC()
 {
 	fetch();
