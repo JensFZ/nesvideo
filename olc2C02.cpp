@@ -2,6 +2,14 @@
 #include "olc2C02.h"
 #include "Cartridge.h"
 
+olc2C02::olc2C02()
+{
+}
+
+olc2C02::~olc2C02()
+{
+}
+
 uint8_t olc2C02::cpuRead(uint16_t addr, bool rdonly)
 {
     uint8_t data = 0x00;
@@ -67,4 +75,8 @@ void olc2C02::ppuWrite(uint16_t addr, uint8_t data)
 void olc2C02::ConnectCartridge(const std::shared_ptr<Cartridge>& cartridge)
 {
     this->cart = cartridge; // Cartridge verbinden
+}
+
+void olc2C02::clock()
+{
 }
