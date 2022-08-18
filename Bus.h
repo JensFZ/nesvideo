@@ -13,7 +13,7 @@ public: //Devices auf dem Bus
 	olc6502 cpu;
 
 	// Fake RAM
-	std::array<uint8_t, 64 * 1024> cpuRam;
+	std::array<uint8_t, 2 * 1024> cpuRam; // 2Kb Ram
 
 public: // BUS lesen und schreiben
 	void cpuWrite(uint16_t addr, uint8_t data);
