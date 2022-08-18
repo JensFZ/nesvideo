@@ -19,6 +19,8 @@ public: //Devices auf dem Bus
 	// Fake RAM
 	std::array<uint8_t, 2 * 1024> cpuRam; // 2Kb Ram
 
+	std::shared_ptr<Cartridge> cart;
+
 public: // BUS lesen und schreiben
 	void cpuWrite(uint16_t addr, uint8_t data);
 	uint8_t cpuRead(uint16_t addr, bool bReadOnly = false);

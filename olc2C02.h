@@ -12,5 +12,13 @@ public:
 	uint8_t ppuRead(uint16_t addr, bool rdonly = false);
 	void	ppuWrite(uint16_t addr, uint8_t data);
 
+
+private:
+	std::shared_ptr<Cartridge> cart;
+
+public:
+	//Interface
+	void ConnectCartridge(const std::shared_ptr<Cartridge>& cartridge);
+	void clock();
 };
 
