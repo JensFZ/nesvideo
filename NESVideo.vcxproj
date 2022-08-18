@@ -129,10 +129,11 @@
   <ItemGroup>
     <ClCompile Include="Bus.cpp" />
     <ClCompile Include="olc6502.cpp" />
-    <ClCompile Include="Quelle.cpp" />
+    <ClCompile Include="olcNes_Video1_6502.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bus.h" />
+    <ClInclude Include="olcPixelGameEngine.h" />
     <ClInclude Include="olc6502.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

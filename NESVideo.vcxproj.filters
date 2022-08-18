@@ -15,13 +15,13 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Quelle.cpp">
-      <Filter>Quelldateien</Filter>
-    </ClCompile>
     <ClCompile Include="Bus.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
     <ClCompile Include="olc6502.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="olcNes_Video1_6502.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
   </ItemGroup>
@@ -30,6 +30,9 @@
       <Filter>Headerdateien</Filter>
     </ClInclude>
     <ClInclude Include="olc6502.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="olcPixelGameEngine.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
   </ItemGroup>
