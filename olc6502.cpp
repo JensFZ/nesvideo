@@ -876,3 +876,23 @@ uint8_t olc6502::TSX() // Transfer Stack Pointer to X Register
 	setFlag(N, x & 0x80);
 	return 0;
 }
+
+uint8_t olc6502::TXA() // Transfer X Register to Accumulator
+{
+	a = x;
+	setFlag(Z, a == 0x00);
+	setFlag(N, a & 0x80);
+	return 0;
+}
+
+uint8_t olc6502::TXS() // Transfer X Register to Stack Pointer
+{
+	stkp = x;
+	return 0;
+}
+
+uint8_t olc6502::TYA() // Transfer Y Register to Stack Pointer
+{
+	stkp = y;
+	return 0;
+}
