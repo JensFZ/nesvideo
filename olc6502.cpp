@@ -690,6 +690,17 @@ uint8_t olc6502::ROR()
 	return 0;
 }
 
+uint8_t olc6502::RTS() // Return from sub
+{
+	stkp++;
+	pc = (uint16_t)read(0x0100 + stkp);
+	stkp++;
+	pc |= (uint16_t)read(0x0100 + stkp) << 8;
+
+	pc++;
+	return 0;
+}
+
 uint8_t olc6502::SBC()
 {
 	fetch();
