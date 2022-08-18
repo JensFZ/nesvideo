@@ -80,8 +80,6 @@
 #define OLC_PGE_APPLICATION
 #include "olcPixelGameEngine.h"
 
-
-
 class Demo_olc6502 : public olc::PixelGameEngine
 {
 public:
