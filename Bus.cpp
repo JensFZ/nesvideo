@@ -37,3 +37,8 @@ uint8_t Bus::cpuRead(uint16_t addr, bool bReadOnly)
 	return data;
 }
 
+void Bus::reset()
+{
+	cpu.reset();
+	nSystemClockCounter = 0;
+}
