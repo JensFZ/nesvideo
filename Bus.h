@@ -1,6 +1,7 @@
 #pragma once
 #include <cstdint>
 #include "olc6502.h"
+#include "olc2C02.h"
 #include <array>
 
 class Bus
@@ -10,7 +11,8 @@ public:
 	~Bus();
 
 public: //Devices auf dem Bus
-	olc6502 cpu;
+	olc6502 cpu; // Prozessor
+	olc2C02 ppu; // Pixel Processing Unit
 
 	// Fake RAM
 	std::array<uint8_t, 2 * 1024> cpuRam; // 2Kb Ram
