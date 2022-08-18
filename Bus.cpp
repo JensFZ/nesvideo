@@ -21,11 +21,13 @@ void Bus::cpuWrite(uint16_t addr, uint8_t data)
 }
 
 uint8_t Bus::cpuRead(uint16_t addr, bool bReadOnly)
-{
-	if (addr >= 0x0000 && addr <= 0xFFFF) {
-		return cpuRam[addr];
+{	
+	uint8_t data = 0x00;
+
+	if (addr >= 0x0000 && addr <= 0x1FFF) {
+		data = cpuRam[addr & 0x07FF];
 	}
 
-	return 0x00;
+	return data;
 }
 
