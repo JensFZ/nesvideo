@@ -15,8 +15,8 @@ Bus::~Bus()
 
 void Bus::cpuWrite(uint16_t addr, uint8_t data)
 {
-	if(addr >= 0x0000 && addr <= 0xFFFF) {
-		cpuRam[addr] = data;
+	if(addr >= 0x0000 && addr <= 0x1FFF) {
+		cpuRam[addr & 0x07FF] = data;
 	}
 }
 
