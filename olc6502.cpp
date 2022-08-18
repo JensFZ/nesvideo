@@ -783,6 +783,21 @@ uint8_t olc6502::PLP() // Pop Status Register off Stack
 	return 0;
 }
 
+uint8_t olc6502::ROL() // Roll left
+{
+	fetch();
+	temp = (uint16_t)(fetched << 1) | getFlag(C);
+	setFlag(C, temp & 0xFF00);
+	setFlag(Z, (temp & 0x00FF) == 0x0000);
+	setFlag(N, temp & 0x0080);
+	if (lookup[opcode].addrmode == &olc6502::IMP) {
+		a = temp & 0x00FF;
+	} else {
+		write(addr_abs, temp & 0x00FF);
+	}
+	return 0;
+}
+
 
 #pragma endregion
 
