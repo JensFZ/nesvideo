@@ -834,3 +834,15 @@ uint8_t olc6502::XXX() // Illigaler opcode verwendet
 {
 	return 0;
 }
+
+uint8_t olc6502::STX() // Store X Register at Address
+{
+	write(addr_abs, x);
+	return 0;
+}
+
+uint8_t olc6502::STY() // Store X Register at Address
+{
+	write(addr_abs, y);
+	return 0;
+}
