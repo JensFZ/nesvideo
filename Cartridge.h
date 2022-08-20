@@ -21,6 +21,8 @@ private:
 	uint8_t nPRGBanks = 0; // Anzahl der Programm Bänke
 	uint8_t nCHRBanks = 0; // Anzahl der CharacterRom Bänke
 
+	std::shared_ptr<Mapper> pMapper;
+
 public:
 	bool cpuRead(uint16_t addr, uint8_t &data);
 	bool cpuWrite(uint16_t addr, uint8_t data);

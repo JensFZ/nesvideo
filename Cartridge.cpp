@@ -35,7 +35,7 @@ Cartridge::Cartridge(const std::string& sFilename)
                 // Aktuell nicht unterstützt
                 break;
             case 1:
-                nPRGBanks = header.prg_rom_chunks;
+                nPRGBanks = header.prg_rom_chunks; 
                 vPRGMemory.resize(nPRGBanks * 16384);
                 ifs.read((char*)vPRGMemory.data(), vPRGMemory.size());
 
@@ -48,6 +48,10 @@ Cartridge::Cartridge(const std::string& sFilename)
                 // Aktuell nicht unterstützt
                 break;
         }
+
+        switch (nMapperID) {
+            case 0: pMapper = std::make_shared<Mapper_000>(nPRGBanks, nCHRBanks); break; // pMapper auf Mapper_000 Klasse Mappen
+        }
         ifs.close();
 
     }
@@ -55,21 +59,42 @@ Cartridge::Cartridge(const std::string& sFilename)
 
 bool Cartridge::cpuRead(uint16_t addr, uint8_t &data)
 {
-
+    uint32_t mapped_addr = 0;
+    if (pMapper->cpuMapRead(addr, mapped_addr)) { //CPU read auf Mapper legen, der gibt die entsprechende Mapped_addr zurück
+        data = vPRGMemory[mapped_addr];
+        return true;
+    }
     return false;
 }
 
 bool Cartridge::cpuWrite(uint16_t addr, uint8_t data)
 {
+    uint32_t mapped_addr = 0;
+    if (pMapper->cpuMapRead(addr, mapped_addr)) { //CPU write auf Mapper legen, der gibt die entsprechende Mapped_addr zurück
+        vPRGMemory[mapped_addr] = data;
+        return true;
+    }
     return false;
 }
 
 bool Cartridge::ppuRead(uint16_t addr, uint8_t &data)
 {
+    uint32_t mapped_addr = 0;
+    if (pMapper->ppuMapRead(addr, mapped_addr)) { //PPU read auf Mapper legen, der gibt die entsprechende Mapped_addr zurück
+        data = vCHRMemory[mapped_addr];
+        return true;
+    }
+
     return false;
 }
 
 bool Cartridge::ppuWrite(uint16_t addr, uint8_t data)
 {
+    uint32_t mapped_addr = 0;
+    if (pMapper->ppuMapRead(addr, mapped_addr)) { //PPU write auf Mapper legen, der gibt die entsprechende Mapped_addr zurück
+        vCHRMemory[mapped_addr] = data;
+        return true;
+    }
+
     return false;
 }
