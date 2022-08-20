@@ -49,6 +49,8 @@ Cartridge::Cartridge(const std::string& sFilename)
                 // Aktuell nicht unterstützt
                 break;
         }
+        ifs.close();
+
     }
 }
 
