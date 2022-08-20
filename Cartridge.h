@@ -18,6 +18,7 @@ private:
 	uint8_t nPRGBanks = 0; // Anzahl der Programm Bänke
 	uint8_t nCHRBanks = 0; // Anzahl der CharacterRom Bänke
 
+public:
 	bool cpuRead(uint16_t addr, bool rdonly = false);
 	bool cpuWrite(uint16_t addr, uint8_t data);
 

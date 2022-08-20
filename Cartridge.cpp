@@ -56,6 +56,7 @@ Cartridge::Cartridge(const std::string& sFilename)
 
 bool Cartridge::cpuRead(uint16_t addr, bool rdonly)
 {
+
     return false;
 }
 
