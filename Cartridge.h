@@ -9,7 +9,7 @@
 class Cartridge
 {
 public: 
-	Cartridge(const std::string& sFilename);
+	Cartridge(const std::string& sFileName);
 	~Cartridge();
 
 

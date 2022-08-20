@@ -1,6 +1,6 @@
 #include "Cartridge.h"
 
-Cartridge::Cartridge(const std::string& sFilename)
+Cartridge::Cartridge(const std::string& sFileName)
 {
     struct sHeader {
         char name[4];
@@ -15,7 +15,7 @@ Cartridge::Cartridge(const std::string& sFilename)
     } header;
 
     std::ifstream ifs;
-    ifs.open(sFilename, std::ifstream::binary);
+    ifs.open(sFileName, std::ifstream::binary);
     if (ifs.is_open()) {
         // Header lesen
         ifs.read((char*)&header, sizeof(sHeader));
