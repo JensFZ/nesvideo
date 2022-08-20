@@ -17,6 +17,10 @@ Cartridge::Cartridge(const std::string& sFilename)
 
     std::ifstream ifs;
     ifs.open(sFilename, std::ifstream::binary);
+    if (ifs.is_open()) {
+        // Header lesen
+        ifs.read((char*)&header, sizeof(sHeader));
+    }
 
 }
 
