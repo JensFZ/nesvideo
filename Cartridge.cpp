@@ -54,20 +54,22 @@ Cartridge::Cartridge(const std::string& sFilename)
     }
 }
 
-uint8_t Cartridge::cpuRead(uint16_t addr, bool rdonly)
+bool Cartridge::cpuRead(uint16_t addr, bool rdonly)
 {
-    return uint8_t();
+    return false;
 }
 
-void Cartridge::cpuWrite(uint16_t addr, uint8_t data)
+bool Cartridge::cpuWrite(uint16_t addr, uint8_t data)
 {
+    return false;
 }
 
-uint8_t Cartridge::ppuRead(uint16_t addr, bool rdonly)
+bool Cartridge::ppuRead(uint16_t addr, bool rdonly)
 {
-    return uint8_t();
+    return false;
 }
 
-void Cartridge::ppuWrite(uint16_t addr, uint8_t data)
+bool Cartridge::ppuWrite(uint16_t addr, uint8_t data)
 {
+    return false;
 }
