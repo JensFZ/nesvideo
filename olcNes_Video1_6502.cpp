@@ -76,6 +76,7 @@
 
 #include "Bus.h"
 #include "olc6502.h"
+//#include "Cartridge.h"
 
 #define OLC_PGE_APPLICATION
 #include "olcPixelGameEngine.h"
@@ -85,6 +86,7 @@ class Demo_olc6502 : public olc::PixelGameEngine
 public:
 	Demo_olc6502() { sAppName = "olc6502 Demonstration"; }
 
+	std::shared_ptr<Cartridge> cart;
 	Bus nes;
 	std::map<uint16_t, std::string> mapAsm;
 
@@ -165,48 +167,16 @@ public:
 
 	bool OnUserCreate()
 	{
-		// Load Program (assembled at https://www.masswerk.at/6502/assembler.html)
-		/*
-			*=$8000
-			LDX #10
-			STX $0000
-			LDX #3
-			STX $0001
-			LDY $0000
-			LDA #0
-			CLC
-			loop
-			ADC $0001
-			DEY
-			BNE loop
-			STA $0002
-			NOP
-			NOP
-			NOP
-		*/
+		// Lade ein Cartridge
+		cart = std::make_shared<Cartridge>("nestest.nes");
 
-		// Convert hex string into bytes for RAM
-		std::stringstream ss;
-		ss << "A2 0A 8E 00 00 A2 03 8E 01 00 AC 00 00 A9 00 18 6D 01 00 88 D0 FA 8D 02 00 EA EA EA";
-		uint16_t nOffset = 0x8000;
-		while (!ss.eof())
-		{
-			std::string b;
-			ss >> b;
-			nes.cpuRam[nOffset++] = (uint8_t)std::stoul(b, nullptr, 16);
-		}
+		// einlegen
+		nes.insertCartridge(cart);
 
-		// Set Reset Vector
-		nes.cpuRam[0xFFFC] = 0x00;
-		nes.cpuRam[0xFFFD] = 0x80;
-
-		// Dont forget to set IRQ and NMI vectors if you want to play with those
-
-		// Extract dissassembly
 		mapAsm = nes.cpu.disassemble(0x0000, 0xFFFF);
 
-		// Reset
-		nes.cpu.reset();
+		nes.reset();
+
 		return true;
 	}
 
@@ -214,32 +184,20 @@ public:
 	{
 		Clear(olc::DARK_BLUE);
 
+		if (GetKey(olc::Key::C).bPressed) {
 
-		if (GetKey(olc::Key::SPACE).bPressed)
-		{
-			do
-			{
-				nes.cpu.clock();
-			} while (!nes.cpu.complete());
+			// nächste Instruktion ausführen
+			do { nes.clock(); } while (!nes.cpu.complete());
+			do { nes.clock(); } while (!nes.cpu.complete());
+
 		}
 
-		if (GetKey(olc::Key::R).bPressed)
-			nes.cpu.reset();
+		if (GetKey(olc::Key::R).bPressed) {
+			nes.reset();
+		}
 
-		if (GetKey(olc::Key::I).bPressed)
-			nes.cpu.irq();
-
-		if (GetKey(olc::Key::N).bPressed)
-			nes.cpu.nmi();
-
-		// Draw Ram Page 0x00		
-		DrawRam(2, 2, 0x0000, 16, 16);
-		DrawRam(2, 182, 0x8000, 16, 16);
-		DrawCpu(448, 2);
-		DrawCode(448, 72, 26);
-
-
-		DrawString(10, 370, "SPACE = Step Instruction    R = RESET    I = IRQ    N = NMI");
+		DrawCpu(516, 2);
+		DrawCode(516, 72, 26);
 
 		return true;
 	}
