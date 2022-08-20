@@ -16,7 +16,7 @@ private:
 
 	uint8_t nMapperID = 0; // Welcher Mapper wird verwendet
 	uint8_t nPRGBanks = 0; // Anzahl der Programm Bänke
-	uint8_t cCHRBanks = 0; // Anzahl der CharacterRom Bänke
+	uint8_t nCHRBanks = 0; // Anzahl der CharacterRom Bänke
 
 	uint8_t cpuRead(uint16_t addr, bool rdonly = false);
 	void	cpuWrite(uint16_t addr, uint8_t data);
