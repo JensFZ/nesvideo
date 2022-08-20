@@ -30,6 +30,9 @@
     <ClCompile Include="Cartridge.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
+    <ClCompile Include="Mapper.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bus.h">
@@ -45,6 +48,9 @@
       <Filter>Headerdateien</Filter>
     </ClInclude>
     <ClInclude Include="Cartridge.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="Mapper.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
   </ItemGroup>
