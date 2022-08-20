@@ -2,6 +2,9 @@
 #include <cstdint>
 #include <string>
 #include <vector>
+#include <fstream>
+
+#include "Mapper_000.h"
 
 class Cartridge
 {

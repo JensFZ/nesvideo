@@ -1,5 +1,4 @@
 #include "Cartridge.h"
-#include <fstream>
 
 Cartridge::Cartridge(const std::string& sFilename)
 {
