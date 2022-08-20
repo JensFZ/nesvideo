@@ -28,7 +28,8 @@ void Bus::cpuWrite(uint16_t addr, uint8_t data)
 uint8_t Bus::cpuRead(uint16_t addr, bool bReadOnly)
 {	
 	uint8_t data = 0x00;
-
+	
+	// Erst die Catridge ansprechen, wenn diese nicht verantwortlich ist, kommt der cpu, ppu teil dran
 	if (cart->cpuWrite(addr, data)) {
 
 	} else 	if (addr >= 0x0000 && addr <= 0x1FFF) {

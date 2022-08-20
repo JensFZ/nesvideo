@@ -54,7 +54,7 @@ Cartridge::Cartridge(const std::string& sFilename)
     }
 }
 
-bool Cartridge::cpuRead(uint16_t addr, bool rdonly)
+bool Cartridge::cpuRead(uint16_t addr, uint8_t &data)
 {
 
     return false;
@@ -65,7 +65,7 @@ bool Cartridge::cpuWrite(uint16_t addr, uint8_t data)
     return false;
 }
 
-bool Cartridge::ppuRead(uint16_t addr, bool rdonly)
+bool Cartridge::ppuRead(uint16_t addr, uint8_t &data)
 {
     return false;
 }
