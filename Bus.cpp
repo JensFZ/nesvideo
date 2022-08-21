@@ -56,9 +56,11 @@ void Bus::reset()
 void Bus::clock()
 {
 	ppu.clock();
+
 	if (nSystemClockCounter % 3 == 0) { // PPU Taktet 3 mal schneller als die CPU -> nur jeden dritten lauf
 		cpu.clock();
 	}
+
 	nSystemClockCounter++;
 }
 
