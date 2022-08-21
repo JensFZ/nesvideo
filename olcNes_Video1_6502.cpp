@@ -187,26 +187,45 @@ public:
 	{
 		Clear(olc::DARK_BLUE);
 
-		if (GetKey(olc::Key::C).bPressed) {
+		if (bEmulationRun) {
 
-			// nächste Instruktion ausführen
-			do { nes.clock(); } while (!nes.cpu.complete());
-			do { nes.clock(); } while (!nes.cpu.complete());
+			if (fResidualTime > 0.0f) {
+				fResidualTime -= fElapsedTime;
+			} else {
+
+				fResidualTime += (1.0f / 60.0f) - fElapsedTime;
+				do { nes.clock(); } while (!nes.ppu.frame_complete);
+				nes.ppu.frame_complete = false;
+			}
+
+		} else {
+	
+			if (GetKey(olc::Key::C).bPressed) {
+	
+				// nächste Instruktion ausführen
+				do { nes.clock(); } while (!nes.cpu.complete());
+				do { nes.clock(); } while (!nes.cpu.complete());
+			}
+	
+			if (GetKey(olc::Key::F).bPressed) {
+	
+				// nächste Instruktion ausführen
+				do { nes.clock(); } while (!nes.ppu.frame_complete);
+				do { nes.clock(); } while (!nes.cpu.complete());
+	
+				nes.ppu.frame_complete = false;
+			}
 		}
-
-		if (GetKey(olc::Key::F).bPressed) {
-
-			// nächste Instruktion ausführen
-			do { nes.clock(); } while (!nes.ppu.frame_complete);
-			do { nes.clock(); } while (!nes.cpu.complete());
-
-			nes.ppu.frame_complete = false;
-		}
-
 
 		if (GetKey(olc::Key::R).bPressed) {
 			nes.reset();
 		}
+
+		if (GetKey(olc::Key::SPACE).bPressed) {
+			bEmulationRun != bEmulationRun;
+		}
+
+
 
 		DrawCpu(516, 2);
 		DrawCode(516, 72, 26);
