@@ -171,7 +171,7 @@ public:
 	bool OnUserCreate()
 	{
 		// Lade ein Cartridge
-		cart = std::make_shared<Cartridge>("C:\\Users\\JensF\\Desktop\\Development\\NES\\Emulator\\NESVideo\\x64\\Debug\\nestest.nes");
+		cart = std::make_shared<Cartridge>("nestest.nes");
 
 		// einlegen
 		nes.insertCartridge(cart);
