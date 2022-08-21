@@ -130,7 +130,7 @@ void olc2C02::cpuWrite(uint16_t addr, uint8_t data)
 uint8_t olc2C02::ppuRead(uint16_t addr, bool rdonly)
 {
     uint8_t data = 0x00;
-    addr &= 0x3FFFF; // Alles größer 0x3FFF wird ignoriert;
+    addr &= 0x3FFF; // Alles größer 0x3FFF wird ignoriert;
 
     // Cartridge ansprechen
     if (cart->ppuRead(addr, data)) {
@@ -197,8 +197,8 @@ void olc2C02::clock()
 
 olc::Pixel& olc2C02::GetColorFromPaletteRam(uint8_t palette, uint8_t pixel)
 {
-    // Palettenmemory geht bei 0x3f00 los.
-    return palScreen[ppuRead(0x3f00 + (palette << 2) + pixel)];
+    // Palettenmemory geht bei 0x3F00 los.
+    return palScreen[ppuRead(0x3F00 + (palette << 2) + pixel) & 0x3F];
 }
 
 olc::Sprite& olc2C02::GetScreen()
@@ -220,8 +220,8 @@ olc::Sprite& olc2C02::GetPatternTable(uint8_t i, uint8_t palette)
 
             for (uint16_t row = 0; row < 8; row++) {
 
-                uint8_t tile_lsb = ppuRead(i * 0x1000 + nOffset + row + 0);
-                uint8_t tile_msb = ppuRead(i * 0x1000 + nOffset + row + 8);
+                uint8_t tile_lsb = ppuRead(i * 0x1000 + nOffset + row + 0x0000);
+                uint8_t tile_msb = ppuRead(i * 0x1000 + nOffset + row + 0x0008);
 
                 for (uint16_t col = 0; col < 8; col++) {
                     uint8_t pixel = (tile_lsb & 0x01) + (tile_msb & 0x01);
