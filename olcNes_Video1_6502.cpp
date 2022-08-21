@@ -93,6 +93,9 @@ public:
 	bool bEmulationRun = false;
 	float fResidualTime = 0.0;
 
+	uint8_t nSelectedPalette = 0x00;
+
+
 	std::string hex(uint32_t n, uint8_t d)
 	{
 		std::string s(d, '0');
@@ -225,10 +228,26 @@ public:
 			bEmulationRun = !bEmulationRun;
 		}
 
+		if (GetKey(olc::Key::P).bPressed) {
+			(++nSelectedPalette) &= 0x07;
+		}
+
 
 
 		DrawCpu(516, 2);
 		DrawCode(516, 72, 26);
+
+		const int nSwatchSize = 6;
+		for (int p = 0; p < 8; p++) { // Palette
+			for (int s = 0; s < 4; s++) { // Index der Palette
+				FillRect(516 + p * (nSwatchSize * 5) + s * nSwatchSize, 340, nSwatchSize, nSwatchSize, nes.ppu.GetColorFromPaletteRam(p, s));
+			}
+		}
+
+		DrawRect(516 + nSelectedPalette * (nSwatchSize * 5) - 1, 339, (nSwatchSize * 4), nSwatchSize, olc::WHITE);
+
+		DrawSprite(516, 348, &nes.ppu.GetPatternTable(0, nSelectedPalette));
+		DrawSprite(648, 348, &nes.ppu.GetPatternTable(1, nSelectedPalette));
 
 		DrawSprite(0, 0, &nes.ppu.GetScreen(), 2);
 
