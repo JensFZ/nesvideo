@@ -57,6 +57,10 @@ Cartridge::Cartridge(const std::string& sFileName)
     }
 }
 
+Cartridge::~Cartridge()
+{
+}
+
 bool Cartridge::cpuRead(uint16_t addr, uint8_t &data)
 {
     uint32_t mapped_addr = 0;
@@ -70,7 +74,7 @@ bool Cartridge::cpuRead(uint16_t addr, uint8_t &data)
 bool Cartridge::cpuWrite(uint16_t addr, uint8_t data)
 {
     uint32_t mapped_addr = 0;
-    if (pMapper->cpuMapRead(addr, mapped_addr)) { //CPU write auf Mapper legen, der gibt die entsprechende Mapped_addr zurück
+    if (pMapper->cpuMapWrite(addr, mapped_addr)) { //CPU write auf Mapper legen, der gibt die entsprechende Mapped_addr zurück
         vPRGMemory[mapped_addr] = data;
         return true;
     }
