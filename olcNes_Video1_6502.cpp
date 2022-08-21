@@ -90,6 +90,9 @@ public:
 	Bus nes;
 	std::map<uint16_t, std::string> mapAsm;
 
+	bool bEmulationRun = false;
+	float fResidualTime = 0.0;
+
 	std::string hex(uint32_t n, uint8_t d)
 	{
 		std::string s(d, '0');
@@ -189,8 +192,17 @@ public:
 			// nächste Instruktion ausführen
 			do { nes.clock(); } while (!nes.cpu.complete());
 			do { nes.clock(); } while (!nes.cpu.complete());
-
 		}
+
+		if (GetKey(olc::Key::F).bPressed) {
+
+			// nächste Instruktion ausführen
+			do { nes.clock(); } while (!nes.ppu.frame_complete);
+			do { nes.clock(); } while (!nes.cpu.complete());
+
+			nes.ppu.frame_complete = false;
+		}
+
 
 		if (GetKey(olc::Key::R).bPressed) {
 			nes.reset();
@@ -198,6 +210,8 @@ public:
 
 		DrawCpu(516, 2);
 		DrawCode(516, 72, 26);
+
+		DrawSprite(0, 0, &nes.ppu.GetScreen(), 2);
 
 		return true;
 	}
