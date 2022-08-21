@@ -94,4 +94,8 @@ private:
 
 		uint8_t reg;
 	} control;
+
+	uint8_t address_latch = 0x00;
+	uint8_t ppu_data_buffer = 0x00;
+	uint16_t ppu_address = 0x0000;
 };
