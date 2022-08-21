@@ -40,12 +40,14 @@ private:
 	olc::Sprite sprScreen = olc::Sprite(256, 240);
 	olc::Sprite sprNameTable[2] = { olc::Sprite(256,240), olc::Sprite(256,240) };
 	olc::Sprite sprPatternTable[2] = { olc::Sprite(128,128), olc::Sprite(128,128) };
-	olc::Pixel& GetColorFromPaletteRam(uint8_t palette, uint8_t pixel);
+
 
 public:
 	olc::Sprite& GetScreen();
 	olc::Sprite& GetNameTable(uint8_t i);
 	olc::Sprite& GetPatternTable(uint8_t i, uint8_t palette);
+	olc::Pixel& GetColorFromPaletteRam(uint8_t palette, uint8_t pixel);
+
 	bool frame_complete = false;
 
 private:
