@@ -38,7 +38,11 @@ bool Mapper_000::cpuMapWrite(uint16_t addr, uint32_t& mapped_addr)
 
 bool Mapper_000::ppuMapRead(uint16_t addr, uint32_t& mapped_addr)
 {
-    if (addr >= 0x0000 && addr <= 0x1FFF) {
+    // There is no mapping required for PPU
+    // PPU Address Bus          CHR ROM
+    // 0x0000 -> 0x1FFF: Map    0x0000 -> 0x1FFF
+    if (addr >= 0x0000 && addr <= 0x1FFF)
+    {
         mapped_addr = addr;
         return true;
     }
@@ -48,11 +52,15 @@ bool Mapper_000::ppuMapRead(uint16_t addr, uint32_t& mapped_addr)
 
 bool Mapper_000::ppuMapWrite(uint16_t addr, uint32_t& mapped_addr)
 {
-    // Dieser Mapper nutzt kein schreiben hier
-    //if (addr >= 0x0000 && addr <= 0x1FFFF) {
-
-    //    return true;
-    //}
+    if (addr >= 0x0000 && addr <= 0x1FFF)
+    {
+        if (nCHRBanks == 0)
+        {
+            // Treat as RAM
+            mapped_addr = addr;
+            return true;
+        }
+    }
 
     return false;
 }

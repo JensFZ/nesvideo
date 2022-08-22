@@ -141,7 +141,7 @@ void olc2C02::cpuWrite(uint16_t addr, uint8_t data)
             }
             break;
         case 0x0007: // PPU Data
-            //ppuWrite()
+            ppuWrite(ppu_address, data);
             break;
     }
 }
@@ -243,11 +243,22 @@ olc::Sprite& olc2C02::GetPatternTable(uint8_t i, uint8_t palette)
                 uint8_t tile_msb = ppuRead(i * 0x1000 + nOffset + row + 0x0008);
 
                 for (uint16_t col = 0; col < 8; col++) {
+                    // We can get the index value by simply adding the bits together
+                    // but we're only interested in the lsb of the row words because...
                     uint8_t pixel = (tile_lsb & 0x01) + (tile_msb & 0x01);
+
+                    // ...we will shift the row words 1 bit right for each column of
+                    // the character.
                     tile_lsb >>= 1; tile_msb >>= 1;
 
-                    sprPatternTable[i].SetPixel(
-                        nTileX * 8 + (7 - col),
+                    // Now we know the location and NES pixel value for a specific location
+                    // in the pattern table, we can translate that to a screen colour, and an
+                    // (x,y) location in the sprite
+                    sprPatternTable[i].SetPixel
+                    (
+                        nTileX * 8 + (7 - col), // Because we are using the lsb of the row word first
+                        // we are effectively reading the row from right
+                        // to left, so we need to draw the row "backwards"
                         nTileY * 8 + row,
                         GetColorFromPaletteRam(palette, pixel)
                     );
