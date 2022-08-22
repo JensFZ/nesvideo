@@ -89,7 +89,6 @@ uint8_t olc2C02::cpuRead(uint16_t addr, bool rdonly)
         case 0x0001: // Mask
             break;
         case 0x0002: // Status
-            status.vertical_blank = 1;
             data = (status.reg & 0xE0) | (ppu_data_buffer & 0x1F); // nur oberen 3 Bit des Statusregisters sind relevant, rest wird mit Noise aus dem ppu_data_buffer gefüllt
             status.vertical_blank = 0;
             address_latch = 0;
@@ -202,7 +201,13 @@ void olc2C02::ConnectCartridge(const std::shared_ptr<Cartridge>& cartridge)
 
 void olc2C02::clock()
 {
+    if (scanline == -1 && cycle == 1) {
+        // Wenn "Kathodenstrahl" links oben -> Vertical_Blank = false
+        status.vertical_blank = 0;
+    }
+
     if (scanline == 241 && cycle == 1) {
+        // Wenn "Kathodenstrahl" rechts unten -> Vertical_Blank = true
         status.vertical_blank = 1;
         if (control.enable_nmi) {
             nmi = true;
