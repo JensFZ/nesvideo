@@ -107,6 +107,7 @@ uint8_t olc2C02::cpuRead(uint16_t addr, bool rdonly)
             ppu_data_buffer = ppuRead(ppu_address);
 
             if (ppu_address > 0x3F00) data = ppu_data_buffer;
+            ppu_address++;
             break;
     }
 
@@ -142,6 +143,7 @@ void olc2C02::cpuWrite(uint16_t addr, uint8_t data)
             break;
         case 0x0007: // PPU Data
             ppuWrite(ppu_address, data);
+            ppu_address++;
             break;
     }
 }
