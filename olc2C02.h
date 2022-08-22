@@ -35,6 +35,8 @@ public:
 	void ConnectCartridge(const std::shared_ptr<Cartridge>& cartridge);
 	void clock();
 
+	bool nmi = false;
+
 private:
 	olc::Pixel palScreen[0x40];
 	olc::Sprite sprScreen = olc::Sprite(256, 240);

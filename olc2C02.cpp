@@ -202,6 +202,14 @@ void olc2C02::ConnectCartridge(const std::shared_ptr<Cartridge>& cartridge)
 
 void olc2C02::clock()
 {
+    if (scanline == 241 && cycle == 1) {
+        status.vertical_blank = 1;
+        if (control.enable_nmi) {
+            nmi = true;
+        }
+    }
+
+
     // etwas rauschen zeichnen
     sprScreen.SetPixel(cycle - 1, scanline, palScreen[(rand() % 2) ? 0x3F : 0x30]);
 
