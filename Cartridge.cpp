@@ -20,7 +20,7 @@ Cartridge::Cartridge(const std::string& sFileName)
         // Header lesen
         ifs.read((char*)&header, sizeof(sHeader));
 
-        if (header.mapper1 & 0x04) {
+        if (header.mapper1 & 0x04) { // "trainer" vorhanden?
             ifs.seekg(512, std::ios_base::cur); //512 Byte überspringen
         }
 
@@ -35,7 +35,7 @@ Cartridge::Cartridge(const std::string& sFileName)
                 // Aktuell nicht unterstützt
                 break;
             case 1:
-                nPRGBanks = header.prg_rom_chunks; 
+                nPRGBanks = header.prg_rom_chunks;
                 vPRGMemory.resize(nPRGBanks * 16384);
                 ifs.read((char*)vPRGMemory.data(), vPRGMemory.size());
 
@@ -104,7 +104,8 @@ bool Cartridge::ppuRead(uint16_t addr, uint8_t &data)
 bool Cartridge::ppuWrite(uint16_t addr, uint8_t data)
 {
     uint32_t mapped_addr = 0;
-    if (pMapper->ppuMapRead(addr, mapped_addr)) { //PPU write auf Mapper legen, der gibt die entsprechende Mapped_addr zurück
+    if (pMapper->ppuMapWrite(addr, mapped_addr))
+    {
         vCHRMemory[mapped_addr] = data;
         return true;
     }
