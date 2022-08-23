@@ -27,6 +27,9 @@ Cartridge::Cartridge(const std::string& sFileName)
         // Header ID lesen
         nMapperID = ((header.mapper2 >> 4) << 4) | (header.mapper1 >> 4);
 
+        //PPU Backround Mirroring
+        mirror = (header.mapper1 & 0x01) ? VERTICAL : HORIZONTAL;
+
         // Dateityp ermitteln
         uint8_t nFileType = 1;
 
