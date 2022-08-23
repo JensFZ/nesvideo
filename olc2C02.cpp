@@ -142,7 +142,7 @@ void olc2C02::cpuWrite(uint16_t addr, uint8_t data)
             break;
         case 0x0007: // PPU Data
             ppuWrite(ppu_address, data);
-            ppu_address++;
+            ppu_address += (control.increment_mode ? 32 : 1); // Wenn incement_Mode -> Vertikal befüllen, wenn nicht Horizontal
             break;
     }
 }
