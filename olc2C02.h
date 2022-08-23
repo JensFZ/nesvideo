@@ -11,7 +11,6 @@ public:
 	olc2C02();
 	~olc2C02();
 
-private:
 	// Speicher:
 	uint8_t tblName[2][1024];		// 2KB sind eigentlich 2x1KB
 	uint8_t	tblPalette[32];			// Paletten

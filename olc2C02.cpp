@@ -158,7 +158,21 @@ uint8_t olc2C02::ppuRead(uint16_t addr, bool rdonly)
     } else if (addr >= 0x0000 && addr <= 0x1FFF) { // Paletten Tables
         data = tblPattern[(addr & 0x1000) >> 12][addr & 0x0FFF];
     } else if (addr >= 0x2000 && addr <= 0x3EFF) { // Nametables
+        addr &= 0x0FFF;
 
+        if (cart->mirror == Cartridge::MIRROR::VERTICAL) {
+            if (addr >= 0x0000 && addr <= 0x03FF) data = tblName[0][addr & 0x03FF];
+            if (addr >= 0x0400 && addr <= 0x07FF) data = tblName[1][addr & 0x03FF];
+            if (addr >= 0x0800 && addr <= 0x0BFF) data = tblName[0][addr & 0x03FF];
+            if (addr >= 0x0C00 && addr <= 0x0FFF) data = tblName[1][addr & 0x03FF];
+
+        } else if (cart->mirror == Cartridge::MIRROR::HORIZONTAL) {
+            
+            if (addr >= 0x0000 && addr <= 0x03FF) data = tblName[0][addr & 0x03FF];
+            if (addr >= 0x0400 && addr <= 0x07FF) data = tblName[0][addr & 0x03FF];
+            if (addr >= 0x0800 && addr <= 0x0BFF) data = tblName[1][addr & 0x03FF];
+            if (addr >= 0x0C00 && addr <= 0x0FFF) data = tblName[1][addr & 0x03FF];
+        }
     } else if (addr >= 0x3F00 && addr <= 0x3FFF) { // Paletten index
         addr &= 0x001F;
         if (addr == 0x0010) addr = 0x0000;
@@ -181,7 +195,22 @@ void olc2C02::ppuWrite(uint16_t addr, uint8_t data)
     } else if (addr >= 0x0000 && addr <= 0x1FFF) { // Paletten Tables
         tblPattern[(addr & 0x1000) >> 12][addr & 0x0FFF] = data;
     } else if (addr >= 0x2000 && addr <= 0x3EFF) { // Nametables
+        addr &= 0x0FFF;
 
+        if (cart->mirror == Cartridge::MIRROR::VERTICAL) {
+            if (addr >= 0x0000 && addr <= 0x03FF) tblName[0][addr & 0x03FF] = data;
+            if (addr >= 0x0400 && addr <= 0x07FF) tblName[1][addr & 0x03FF] = data;
+            if (addr >= 0x0800 && addr <= 0x0BFF) tblName[0][addr & 0x03FF] = data;
+            if (addr >= 0x0C00 && addr <= 0x0FFF) tblName[1][addr & 0x03FF] = data;
+
+        }
+        else if (cart->mirror == Cartridge::MIRROR::HORIZONTAL) {
+
+            if (addr >= 0x0000 && addr <= 0x03FF) tblName[0][addr & 0x03FF] = data;
+            if (addr >= 0x0400 && addr <= 0x07FF) tblName[0][addr & 0x03FF] = data;
+            if (addr >= 0x0800 && addr <= 0x0BFF) tblName[1][addr & 0x03FF] = data;
+            if (addr >= 0x0C00 && addr <= 0x0FFF) tblName[1][addr & 0x03FF] = data;
+        }
     } else if (addr >= 0x3F00 && addr <= 0x3FFF) { // Paletten index
         addr &= 0x001F;
         if (addr == 0x0010) addr = 0x0000;
@@ -216,7 +245,7 @@ void olc2C02::clock()
 
 
     // etwas rauschen zeichnen
-    sprScreen.SetPixel(cycle - 1, scanline, palScreen[(rand() % 2) ? 0x3F : 0x30]);
+    //sprScreen.SetPixel(cycle - 1, scanline, palScreen[(rand() % 2) ? 0x3F : 0x30]);
 
     cycle++;
     if (cycle >= 341) {
