@@ -103,10 +103,10 @@ uint8_t olc2C02::cpuRead(uint16_t addr, bool rdonly)
             break;
         case 0x0007: // PPU Data
             data = ppu_data_buffer;
-            ppu_data_buffer = ppuRead(ppu_address);
+            ppu_data_buffer = ppuRead(vram_addr.reg);
 
-            if (ppu_address > 0x3F00) data = ppu_data_buffer;
-            ppu_address++;
+            if (vram_addr.reg > 0x3F00) data = ppu_data_buffer;
+            vram_addr.reg += (control.increment_mode ? 32 : 1); // Wenn incement_Mode -> Vertikal befüllen, wenn nicht Horizontal
             break;
     }
 
@@ -118,6 +118,8 @@ void olc2C02::cpuWrite(uint16_t addr, uint8_t data)
     switch (addr) {
         case 0x0000: // Control
             control.reg = data;
+            tram_addr.nametable_x = control.nametable_x;
+            tram_addr.nametable_y = control.nametable_y;
             break;
         case 0x0001: // Mask
             mask.reg = data;
@@ -130,19 +132,30 @@ void olc2C02::cpuWrite(uint16_t addr, uint8_t data)
         case 0x0004: // OAM Data
             break;
         case 0x0005: // Scroll
+            if (address_latch == 0) {
+                fine_x = data & 0x07;
+                tram_addr.coarse_x = data >> 3;
+                address_latch = 1;
+            } else {
+                tram_addr.fine_y = data & 0x07;
+                tram_addr.coarse_y = data >> 3;
+
+                address_latch = 0;
+            }
             break;
         case 0x0006: // PPU Address
             if (address_latch == 0) {
-                ppu_address = (ppu_address & 0x00FF) | (data << 8);
+                tram_addr.reg = (tram_addr.reg & 0x00FF) | (data << 8);
                 address_latch = 1;
             } else {
-                ppu_address = (ppu_address & 0xFF00) | data;
+                tram_addr.reg = (tram_addr.reg & 0xFF00) | data;
+                vram_addr = tram_addr;
                 address_latch = 0;
             }
             break;
         case 0x0007: // PPU Data
-            ppuWrite(ppu_address, data);
-            ppu_address += (control.increment_mode ? 32 : 1); // Wenn incement_Mode -> Vertikal befüllen, wenn nicht Horizontal
+            ppuWrite(vram_addr.reg, data);
+            vram_addr.reg += (control.increment_mode ? 32 : 1); // Wenn incement_Mode -> Vertikal befüllen, wenn nicht Horizontal
             break;
     }
 }
@@ -160,18 +173,29 @@ uint8_t olc2C02::ppuRead(uint16_t addr, bool rdonly)
     } else if (addr >= 0x2000 && addr <= 0x3EFF) { // Nametables
         addr &= 0x0FFF;
 
-        if (cart->mirror == Cartridge::MIRROR::VERTICAL) {
-            if (addr >= 0x0000 && addr <= 0x03FF) data = tblName[0][addr & 0x03FF];
-            if (addr >= 0x0400 && addr <= 0x07FF) data = tblName[1][addr & 0x03FF];
-            if (addr >= 0x0800 && addr <= 0x0BFF) data = tblName[0][addr & 0x03FF];
-            if (addr >= 0x0C00 && addr <= 0x0FFF) data = tblName[1][addr & 0x03FF];
-
-        } else if (cart->mirror == Cartridge::MIRROR::HORIZONTAL) {
-            
-            if (addr >= 0x0000 && addr <= 0x03FF) data = tblName[0][addr & 0x03FF];
-            if (addr >= 0x0400 && addr <= 0x07FF) data = tblName[0][addr & 0x03FF];
-            if (addr >= 0x0800 && addr <= 0x0BFF) data = tblName[1][addr & 0x03FF];
-            if (addr >= 0x0C00 && addr <= 0x0FFF) data = tblName[1][addr & 0x03FF];
+        if (cart->mirror == Cartridge::MIRROR::VERTICAL)
+        {
+            // Vertical
+            if (addr >= 0x0000 && addr <= 0x03FF)
+                data = tblName[0][addr & 0x03FF];
+            if (addr >= 0x0400 && addr <= 0x07FF)
+                data = tblName[1][addr & 0x03FF];
+            if (addr >= 0x0800 && addr <= 0x0BFF)
+                data = tblName[0][addr & 0x03FF];
+            if (addr >= 0x0C00 && addr <= 0x0FFF)
+                data = tblName[1][addr & 0x03FF];
+        }
+        else if (cart->mirror == Cartridge::MIRROR::HORIZONTAL)
+        {
+            // Horizontal
+            if (addr >= 0x0000 && addr <= 0x03FF)
+                data = tblName[0][addr & 0x03FF];
+            if (addr >= 0x0400 && addr <= 0x07FF)
+                data = tblName[0][addr & 0x03FF];
+            if (addr >= 0x0800 && addr <= 0x0BFF)
+                data = tblName[1][addr & 0x03FF];
+            if (addr >= 0x0C00 && addr <= 0x0FFF)
+                data = tblName[1][addr & 0x03FF];
         }
     } else if (addr >= 0x3F00 && addr <= 0x3FFF) { // Paletten index
         addr &= 0x001F;
@@ -196,20 +220,29 @@ void olc2C02::ppuWrite(uint16_t addr, uint8_t data)
         tblPattern[(addr & 0x1000) >> 12][addr & 0x0FFF] = data;
     } else if (addr >= 0x2000 && addr <= 0x3EFF) { // Nametables
         addr &= 0x0FFF;
-
-        if (cart->mirror == Cartridge::MIRROR::VERTICAL) {
-            if (addr >= 0x0000 && addr <= 0x03FF) tblName[0][addr & 0x03FF] = data;
-            if (addr >= 0x0400 && addr <= 0x07FF) tblName[1][addr & 0x03FF] = data;
-            if (addr >= 0x0800 && addr <= 0x0BFF) tblName[0][addr & 0x03FF] = data;
-            if (addr >= 0x0C00 && addr <= 0x0FFF) tblName[1][addr & 0x03FF] = data;
-
+        if (cart->mirror == Cartridge::MIRROR::VERTICAL)
+        {
+            // Vertical
+            if (addr >= 0x0000 && addr <= 0x03FF)
+                tblName[0][addr & 0x03FF] = data;
+            if (addr >= 0x0400 && addr <= 0x07FF)
+                tblName[1][addr & 0x03FF] = data;
+            if (addr >= 0x0800 && addr <= 0x0BFF)
+                tblName[0][addr & 0x03FF] = data;
+            if (addr >= 0x0C00 && addr <= 0x0FFF)
+                tblName[1][addr & 0x03FF] = data;
         }
-        else if (cart->mirror == Cartridge::MIRROR::HORIZONTAL) {
-
-            if (addr >= 0x0000 && addr <= 0x03FF) tblName[0][addr & 0x03FF] = data;
-            if (addr >= 0x0400 && addr <= 0x07FF) tblName[0][addr & 0x03FF] = data;
-            if (addr >= 0x0800 && addr <= 0x0BFF) tblName[1][addr & 0x03FF] = data;
-            if (addr >= 0x0C00 && addr <= 0x0FFF) tblName[1][addr & 0x03FF] = data;
+        else if (cart->mirror == Cartridge::MIRROR::HORIZONTAL)
+        {
+            // Horizontal
+            if (addr >= 0x0000 && addr <= 0x03FF)
+                tblName[0][addr & 0x03FF] = data;
+            if (addr >= 0x0400 && addr <= 0x07FF)
+                tblName[0][addr & 0x03FF] = data;
+            if (addr >= 0x0800 && addr <= 0x0BFF)
+                tblName[1][addr & 0x03FF] = data;
+            if (addr >= 0x0C00 && addr <= 0x0FFF)
+                tblName[1][addr & 0x03FF] = data;
         }
     } else if (addr >= 0x3F00 && addr <= 0x3FFF) { // Paletten index
         addr &= 0x001F;
@@ -230,9 +263,190 @@ void olc2C02::ConnectCartridge(const std::shared_ptr<Cartridge>& cartridge)
 
 void olc2C02::clock()
 {
-    if (scanline == -1 && cycle == 1) {
-        // Wenn "Kathodenstrahl" links oben -> Vertical_Blank = false
-        status.vertical_blank = 0;
+
+    auto IncrementScrollX = [&]()
+    {
+        if (mask.render_background || mask.render_sprites) // Nur ausführen, wenn auch was gerendet werden soll
+        {
+            // Eine Nametable ist 32x30 tiles groß. Wenn wir an das ende einer Nametable Zeile kommen, müssen wir in die nächste Nametable befüllen
+            if (vram_addr.coarse_x == 31)
+            {
+                // Zurück zu 0
+                vram_addr.coarse_x = 0;
+                // Nächste Nametable
+                vram_addr.nametable_x = ~vram_addr.nametable_x;
+            }
+            else
+            {
+                // Sind noch in der richtigen Nametable -> einfach +1
+                vram_addr.coarse_x++;
+            }
+        }
+    };
+
+    // ==============================================================================
+    // Increment the background tile "pointer" one scanline vertically
+    auto IncrementScrollY = [&]()
+    {
+        // Incrementing vertically is more complicated. The visible nametable
+        // is 32x30 tiles, but in memory there is enough room for 32x32 tiles.
+        // The bottom two rows of tiles are in fact not tiles at all, they
+        // contain the "attribute" information for the entire table. This is
+        // information that describes which palettes are used for different 
+        // regions of the nametable.
+
+        // In addition, the NES doesnt scroll vertically in chunks of 8 pixels
+        // i.e. the height of a tile, it can perform fine scrolling by using
+        // the fine_y component of the register. This means an increment in Y
+        // first adjusts the fine offset, but may need to adjust the whole
+        // row offset, since fine_y is a value 0 to 7, and a row is 8 pixels high
+
+        // Ony if rendering is enabled
+        if (mask.render_background || mask.render_sprites)
+        {
+            // If possible, just increment the fine y offset
+            if (vram_addr.fine_y < 7)
+            {
+                vram_addr.fine_y++;
+            }
+            else
+            {
+                // If we have gone beyond the height of a row, we need to
+                // increment the row, potentially wrapping into neighbouring
+                // vertical nametables. Dont forget however, the bottom two rows
+                // do not contain tile information. The coarse y offset is used
+                // to identify which row of the nametable we want, and the fine
+                // y offset is the specific "scanline"
+
+                // Reset fine y offset
+                vram_addr.fine_y = 0;
+
+                // Check if we need to swap vertical nametable targets
+                if (vram_addr.coarse_y == 29)
+                {
+                    // We do, so reset coarse y offset
+                    vram_addr.coarse_y = 0;
+                    // And flip the target nametable bit
+                    vram_addr.nametable_y = ~vram_addr.nametable_y;
+                }
+                else if (vram_addr.coarse_y == 31)
+                {
+                    // In case the pointer is in the attribute memory, we
+                    // just wrap around the current nametable
+                    vram_addr.coarse_y = 0;
+                }
+                else
+                {
+                    // None of the above boundary/wrapping conditions apply
+                    // so just increment the coarse y offset
+                    vram_addr.coarse_y++;
+                }
+            }
+        }
+    };
+
+    // ==============================================================================
+    // Transfer the temporarily stored horizontal nametable access information
+    // into the "pointer". Note that fine x scrolling is not part of the "pointer"
+    // addressing mechanism
+    auto TransferAddressX = [&]()
+    {
+        // Ony if rendering is enabled
+        if (mask.render_background || mask.render_sprites)
+        {
+            vram_addr.nametable_x = tram_addr.nametable_x;
+            vram_addr.coarse_x = tram_addr.coarse_x;
+        }
+    };
+
+    // ==============================================================================
+    // Transfer the temporarily stored vertical nametable access information
+    // into the "pointer". Note that fine y scrolling is part of the "pointer"
+    // addressing mechanism
+    auto TransferAddressY = [&]()
+    {
+        // Ony if rendering is enabled
+        if (mask.render_background || mask.render_sprites)
+        {
+            vram_addr.fine_y = tram_addr.fine_y;
+            vram_addr.nametable_y = tram_addr.nametable_y;
+            vram_addr.coarse_y = tram_addr.coarse_y;
+        }
+    };
+
+    auto LoadBackgroundShifters = [&]() {
+        bg_shifter_pattern_lo = (bg_shifter_pattern_lo & 0xFF00) | bg_next_tile_lsb;
+        bg_shifter_pattern_hi = (bg_shifter_pattern_hi & 0xFF00) | bg_next_tile_msb;
+
+        bg_shifter_attrib_lo = (bg_shifter_attrib_lo & 0xFF00) | ((bg_next_tile_attrib & 0b01) ? 0xFF : 0x00);
+        bg_shifter_attrib_hi = (bg_shifter_attrib_hi & 0xFF00) | ((bg_next_tile_attrib & 0b10) ? 0xFF : 0x00);
+    };
+
+    auto UpdateShifters = [&]() {
+        if (mask.render_background) {
+            bg_shifter_pattern_lo <<= 1;
+            bg_shifter_pattern_hi <<= 1;
+
+            bg_shifter_attrib_lo <<= 1;
+            bg_shifter_attrib_hi <<= 1;
+        }
+    };
+
+    if (scanline >= -1 && scanline < 240) {
+
+        if (scanline == 0 && cycle == 0)
+        {
+            // "Odd Frame" cycle skip
+            cycle = 1;
+        }
+
+        if (scanline == -1 && cycle == 1) {
+            // Wenn "Kathodenstrahl" links oben -> Vertical_Blank = false
+            status.vertical_blank = 0;
+        }
+
+        if ((cycle >= 2 && cycle < 258) || (cycle >= 321 && cycle < 338)) {
+
+            UpdateShifters();
+
+            // Das alles ist sehr schwer zu lesen. bildet aber im großen und ganzen folgende Grafik nach: https://www.nesdev.org/w/images/default/4/4f/Ppu.svg
+            switch ((cycle - 1) % 8) {
+                case 0:
+                    LoadBackgroundShifters();
+
+                    bg_next_tile_id = ppuRead(0x2000 | (vram_addr.reg & 0x0FFF));
+                    break;
+                case 2:
+                    bg_next_tile_attrib = ppuRead(0x23C0 | (vram_addr.nametable_y << 11)
+                        | (vram_addr.nametable_x << 10)
+                        | ((vram_addr.coarse_y >> 2) << 3)
+                        | (vram_addr.coarse_x >> 2));
+
+                    if (vram_addr.coarse_y & 0x02) bg_next_tile_attrib >>= 4;
+                    if (vram_addr.coarse_x & 0x02) bg_next_tile_attrib >>= 2;
+                    bg_next_tile_attrib &= 0x03;
+
+                    break;
+                case 4:
+                    bg_next_tile_lsb = ppuRead((control.pattern_background << 12)
+                        + ((uint16_t)bg_next_tile_id << 4)
+                        + (vram_addr.fine_y) + 0);
+                    break;
+                case 6:
+                    bg_next_tile_msb = ppuRead((control.pattern_background << 12)
+                        + ((uint16_t)bg_next_tile_id << 4)
+                        + (vram_addr.fine_y) + 8);
+
+                    break;
+                case 7:
+                    break;
+            }
+        }
+
+        if (cycle == 256) {
+
+        }
+
     }
 
     if (scanline == 241 && cycle == 1) {
@@ -244,8 +458,28 @@ void olc2C02::clock()
     }
 
 
+    uint8_t bg_pixel = 0x00;
+    uint8_t bg_palette = 0x00;
+
+    if (mask.render_background) {
+        uint16_t bit_mux = 0x8000 >> fine_x;
+        
+        uint8_t p0_pixel = (bg_shifter_pattern_lo & bit_mux) > 0;
+        uint8_t p1_pixel = (bg_shifter_pattern_hi & bit_mux) > 0;
+
+        bg_pixel = (p1_pixel << 1) | p0_pixel;
+
+        uint8_t bg_pal0 = (bg_shifter_attrib_lo & bit_mux) > 0;
+        uint8_t bg_pal1 = (bg_shifter_attrib_hi & bit_mux) > 0;
+        bg_palette = (bg_pal1 << 1) | bg_pal0;  
+
+
+    }
+
+
+
     // etwas rauschen zeichnen
-    //sprScreen.SetPixel(cycle - 1, scanline, palScreen[(rand() % 2) ? 0x3F : 0x30]);
+    sprScreen.SetPixel(cycle - 1, scanline, GetColorFromPaletteRam(bg_palette, bg_pixel));
 
     cycle++;
     if (cycle >= 341) {
