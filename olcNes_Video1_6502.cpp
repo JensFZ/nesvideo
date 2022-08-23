@@ -251,6 +251,12 @@ public:
 
 		DrawSprite(0, 0, &nes.ppu.GetScreen(), 2);
 
+		for (uint8_t y = 0; y < 30; y++) {
+			for (uint8_t x = 0; x < 32; x++) {
+				DrawString(x * 16, y * 16, hex((uint8_t)nes.ppu.tblName[0][y*32+x], 2));
+			}
+		}
+
 		return true;
 	}
 };
