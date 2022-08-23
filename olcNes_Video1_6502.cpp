@@ -96,11 +96,11 @@ public:
 	uint8_t nSelectedPalette = 0x00;
 
 
-	std::string hex(uint32_t n, uint8_t d)
+	std::string hex(uint32_t wert, uint8_t Stellen)
 	{
-		std::string s(d, '0');
-		for (int i = d - 1; i >= 0; i--, n >>= 4)
-			s[i] = "0123456789ABCDEF"[n & 0xF];
+		std::string s(Stellen, '0');
+		for (int i = Stellen - 1; i >= 0; i--, wert >>= 4)
+			s[i] = "0123456789ABCDEF"[wert & 0xF];
 		return s;
 	};
 
