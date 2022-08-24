@@ -212,7 +212,7 @@ uint8_t olc2C02::ppuRead(uint16_t addr, bool rdonly)
 
 void olc2C02::ppuWrite(uint16_t addr, uint8_t data)
 {
-    addr &= 0x3FFF; // Alles größer 0x3FFF wird ignoriert;
+    addr &= 0x3FFF; // Alles größer 0x3FFF wird ignoriert ( AND mit 0011111111111111 -> ersten beiden Bits werden weggeworfen)
     // Cartridge ansprechen
     if (cart->ppuWrite(addr, data)) {
 
