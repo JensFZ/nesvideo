@@ -89,7 +89,7 @@ private:
 			uint8_t pattern_sprite : 1;
 			uint8_t pattern_background : 1;
 			uint8_t sprite_size : 1;
-			uint8_t slave_mode : 1;
+			uint8_t slave_mode : 1; // unused
 			uint8_t enable_nmi : 1;
 		};
 
