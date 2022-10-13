@@ -362,7 +362,7 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 
-MakeLists.txt.user
+CMakeLists.txt.user
 CMakeCache.txt
 CMakeFiles
 CMakeScripts
@@ -374,7 +374,7 @@ compile_commands.json
 CTestTestfile.cmake
 _deps
 
-build/MakeLists.txt.user
+build/CMakeLists.txt.user
 build/CMakeCache.txt
 build/CMakeFiles
 build/CMakeScripts
