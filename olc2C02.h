@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include <cstdint>
 #include "Cartridge.h"
 #include <memory>
@@ -14,7 +14,7 @@ public:
 	// Speicher:
 	uint8_t tblName[2][1024];		// 2KB sind eigentlich 2x1KB
 	uint8_t	tblPalette[32];			// Paletten
-	uint8_t	tblPattern[2][4096];	// wird eigentlich nicht ben�tigt, da es in der Cartridge eigentlich sitzt
+	uint8_t	tblPattern[2][4096];	// wird eigentlich nicht benötigt, da es in der Cartridge eigentlich sitzt
 
 public:
 	// BUS ansprechen

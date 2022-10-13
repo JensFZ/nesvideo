@@ -35,7 +35,7 @@ uint8_t Bus::cpuRead(uint16_t addr, bool bReadOnly)
 	} else 	if (addr >= 0x0000 && addr <= 0x1FFF) {
 		data = cpuRam[addr & 0x07FF];
 	} else if (addr >= 0x2000 && addr <= 0x3FFF) {
-		data = ppu.cpuRead(addr & 0x0007);
+		data = ppu.cpuRead(addr & 0x0007, bReadOnly);
 	}
 
 	return data;

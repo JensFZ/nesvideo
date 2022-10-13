@@ -1,4 +1,4 @@
-#include <memory>
+ï»¿#include <memory>
 #include "olc2C02.h"
 #include "Cartridge.h"
 
@@ -82,32 +82,55 @@ olc2C02::~olc2C02()
 uint8_t olc2C02::cpuRead(uint16_t addr, bool rdonly)
 {
     uint8_t data = 0x00;
+    if (rdonly) {
+        switch (addr) {
+            case 0x0000:
+                data = control.reg;
+                break;
+            case 0x0001:
+                data = mask.reg;
+                break;
+            case 0x0002:
+                data = status.reg;
+                break;
+            case 0x0003:
+                break;
+            case 0x0004:
+                break;
+            case 0x0005:
+                break;
+            case 0x0006:
+                break;
+            case 0x0007:
+                break;
+        }
+    } else {
+        switch (addr) {
+            case 0x0000: // Control
+                break;
+            case 0x0001: // Mask
+                break;
+            case 0x0002: // Status
+                data = (status.reg & 0xE0) | (ppu_data_buffer & 0x1F); // nur oberen 3 Bit des Statusregisters sind relevant, rest wird mit Noise aus dem ppu_data_buffer gefÃ¼llt
+                status.vertical_blank = 0;
+                address_latch = 0;
+                break;
+            case 0x0003: // OAM Adresse
+                break;
+            case 0x0004: // OAM Data
+                break;
+            case 0x0005: // Scroll
+                break;
+            case 0x0006: // PPU Address
+                break;
+            case 0x0007: // PPU Data
+                data = ppu_data_buffer;
+                ppu_data_buffer = ppuRead(vram_addr.reg);
 
-    switch (addr) {
-        case 0x0000: // Control
-            break;
-        case 0x0001: // Mask
-            break;
-        case 0x0002: // Status
-            data = (status.reg & 0xE0) | (ppu_data_buffer & 0x1F); // nur oberen 3 Bit des Statusregisters sind relevant, rest wird mit Noise aus dem ppu_data_buffer gefüllt
-            status.vertical_blank = 0;
-            address_latch = 0;
-            break;
-        case 0x0003: // OAM Adresse
-            break;
-        case 0x0004: // OAM Data
-            break;
-        case 0x0005: // Scroll
-            break;
-        case 0x0006: // PPU Address
-            break;
-        case 0x0007: // PPU Data
-            data = ppu_data_buffer;
-            ppu_data_buffer = ppuRead(vram_addr.reg);
-
-            if (vram_addr.reg > 0x3F00) data = ppu_data_buffer;
-            vram_addr.reg += (control.increment_mode ? 32 : 1); // Wenn incement_Mode -> Vertikal befüllen, wenn nicht Horizontal
-            break;
+                if (vram_addr.reg > 0x3F00) data = ppu_data_buffer;
+                vram_addr.reg += (control.increment_mode ? 32 : 1); // Wenn incement_Mode -> Vertikal befÃ¼llen, wenn nicht Horizontal
+                break;
+        }
     }
 
     return data;
@@ -155,7 +178,7 @@ void olc2C02::cpuWrite(uint16_t addr, uint8_t data)
             break;
         case 0x0007: // PPU Data
             ppuWrite(vram_addr.reg, data);
-            vram_addr.reg += (control.increment_mode ? 32 : 1); // Wenn incement_Mode -> Vertikal befüllen, wenn nicht Horizontal
+            vram_addr.reg += (control.increment_mode ? 32 : 1); // Wenn incement_Mode -> Vertikal befÃ¼llen, wenn nicht Horizontal
             break;
     }
 }
@@ -163,7 +186,7 @@ void olc2C02::cpuWrite(uint16_t addr, uint8_t data)
 uint8_t olc2C02::ppuRead(uint16_t addr, bool rdonly)
 {
     uint8_t data = 0x00;
-    addr &= 0x3FFF; // Alles größer 0x3FFF wird ignoriert;
+    addr &= 0x3FFF; // Alles grÃ¶ÃŸer 0x3FFF wird ignoriert;
 
     // Cartridge ansprechen
     if (cart->ppuRead(addr, data)) {
@@ -212,7 +235,7 @@ uint8_t olc2C02::ppuRead(uint16_t addr, bool rdonly)
 
 void olc2C02::ppuWrite(uint16_t addr, uint8_t data)
 {
-    addr &= 0x3FFF; // Alles größer 0x3FFF wird ignoriert ( AND mit 0011111111111111 -> ersten beiden Bits werden weggeworfen)
+    addr &= 0x3FFF; // Alles grÃ¶ÃŸer 0x3FFF wird ignoriert ( AND mit 0011111111111111 -> ersten beiden Bits werden weggeworfen)
     // Cartridge ansprechen
     if (cart->ppuWrite(addr, data)) {
 
@@ -266,14 +289,14 @@ void olc2C02::clock()
 
     auto IncrementScrollX = [&]()
     {
-        if (mask.render_background || mask.render_sprites) // Nur ausführen, wenn auch was gerendet werden soll
+        if (mask.render_background || mask.render_sprites) // Nur ausfÃ¼hren, wenn auch was gerendet werden soll
         {
-            // Eine Nametable ist 32x30 tiles groß. Wenn wir an das ende einer Nametable Zeile kommen, müssen wir in die nächste Nametable befüllen
+            // Eine Nametable ist 32x30 tiles groÃŸ. Wenn wir an das ende einer Nametable Zeile kommen, mÃ¼ssen wir in die nÃ¤chste Nametable befÃ¼llen
             if (vram_addr.coarse_x == 31)
             {
-                // Zurück zu 0
+                // ZurÃ¼ck zu 0
                 vram_addr.coarse_x = 0;
-                // Nächste Nametable
+                // NÃ¤chste Nametable
                 vram_addr.nametable_x = ~vram_addr.nametable_x;
             }
             else
@@ -409,7 +432,7 @@ void olc2C02::clock()
 
             UpdateShifters();
 
-            // Das alles ist sehr schwer zu lesen. bildet aber im großen und ganzen folgende Grafik nach: https://www.nesdev.org/w/images/default/4/4f/Ppu.svg
+            // Das alles ist sehr schwer zu lesen. bildet aber im groÃŸen und ganzen folgende Grafik nach: https://www.nesdev.org/w/images/default/4/4f/Ppu.svg
             switch ((cycle - 1) % 8) {
                 case 0:
                     LoadBackgroundShifters();
@@ -439,21 +462,39 @@ void olc2C02::clock()
 
                     break;
                 case 7:
+                    IncrementScrollX();
                     break;
             }
         }
 
         if (cycle == 256) {
-
+            IncrementScrollY();
+        } else if (cycle == 257) {
+            LoadBackgroundShifters();
+            TransferAddressX();
         }
+        else if (cycle == 338 || cycle == 340) {
+            bg_next_tile_id = ppuRead(0x2000 | (vram_addr.reg & 0x0FFF));
+        }
+
+        if (scanline == -1 && cycle >= 280 && cycle < 305) {
+            TransferAddressY();
+        }
+
 
     }
 
-    if (scanline == 241 && cycle == 1) {
-        // Wenn "Kathodenstrahl" rechts unten -> Vertical_Blank = true
-        status.vertical_blank = 1;
-        if (control.enable_nmi) {
-            nmi = true;
+    if (scanline == 240) {
+        // Post Render Scanline -> Nichts zu tun
+    }
+
+    if (scanline >= 241 && scanline < 261) {
+        if (scanline == 241 && cycle == 1) {
+            // Wenn "Kathodenstrahl" rechts unten -> Vertical_Blank = true
+            status.vertical_blank = 1;
+            if (control.enable_nmi) {
+                nmi = true;
+            }
         }
     }
 
